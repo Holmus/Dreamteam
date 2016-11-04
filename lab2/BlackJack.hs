@@ -50,13 +50,16 @@ hand0 = Add (Card (Numeric 2) Hearts)
 hand1 = Add (Card Ace Hearts)
             (Add (Card Ace Spades) Empty)
 
+hand2 = Add (Card Jack Hearts)
+            (Add (Card (Numeric 5) Spades) Empty)
+
 -- Given two hands <+ puts the first one on top of the second one
 
 (<+) :: Hand -> Hand -> Hand
 (<+) Empty Empty = Empty
-(<+) Empty (Add c2 h2) = h2
-(<+) (Add c1 h1) Empty = h1
-(<+) (Add c1 h1) h2 = (<+) h1 (Add c1 h2) 
+(<+) Empty h2 = h2
+(<+) h1 Empty = h1
+(<+) (Add c1 h1) h2 = (Add c1 ((<+) h1 h2))  --(<+) h1 (Add c1 (Add c2 h2))   -- h1 (Add c1 h2) 
 
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 =
