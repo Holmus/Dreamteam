@@ -46,6 +46,7 @@ winner gHand bHand | gameOver gHand = Bank
 
 hand0 = Add (Card (Numeric 2) Hearts)
             (Add (Card Jack Spades) Empty)
+
 hand1 = Add (Card Ace Hearts)
             (Add (Card Ace Spades) Empty)
 
@@ -83,6 +84,5 @@ playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2
 								  | otherwise = h2
 		where (hand1, hand2) = draw h1 
 
-shuffle :: StdGen -> Hand -> Hand
 
 
