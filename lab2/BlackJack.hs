@@ -50,8 +50,39 @@ hand1 = Add (Card Ace Hearts)
             (Add (Card Ace Spades) Empty)
 
 -- Given two hands <+ puts the first one on top of the second one
+
 (<+) :: Hand -> Hand -> Hand
 (<+) Empty Empty = Empty
 (<+) Empty (Add c2 h2) = h2
 (<+) (Add c1 h1) Empty = h1
-(<+) (Add c1 h1) h2 = (<+) h1 (Add c1 h2)
+(<+) (Add c1 h1) h2 = (<+) h1 (Add c1 h2) 
+
+prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
+prop_onTopOf_assoc p1 p2 p3 =
+    p1<+(p2<+p3) == (p1<+p2)<+p3
+
+--Furthermore the size of the combined hand should be the sum of the sizes of the two individual hands:
+prop_size_onTopOf :: Hand -> Hand -> Bool
+prop_size_onTopOf h1 h2 = size h1 + size h2 == size ((<+) h1 h2)
+
+fullDeck :: Hand
+fullDeck = foldr Add Empty
+			[Card rank suit | 
+            rank <- map Numeric [2..10]++[Jack,Queen,King,Ace], 
+            suit <- [Hearts, Spades, Diamonds, Clubs]]
+
+draw :: Hand -> Hand -> (Hand,Hand) 
+draw Empty (Add c2 h2) = error "draw: The deck is empty."
+draw (Add c1 h1) (Add c2 h2) = (h1, (Add c1 h2))
+
+playBank :: Hand -> Hand
+playBank deck = playBank' deck Empty
+
+playBank' :: Hand -> Hand -> Hand -- Deck, current hand and gives the final hand for the bank
+playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2 
+								  | otherwise = h2
+		where (hand1, hand2) = draw h1 
+
+shuffle :: StdGen -> Hand -> Hand
+
+
