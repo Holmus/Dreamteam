@@ -82,7 +82,7 @@ playBank deck = playBank' deck Empty
 playBank' :: Hand -> Hand -> Hand -- Deck, current hand and gives the final hand for the bank
 playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2 
 								  | otherwise = h2
-		where (hand1, hand2) = draw h1 
+		where (hand1, hand2) = draw h1 h2
 
 
 
