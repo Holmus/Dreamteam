@@ -62,9 +62,9 @@ numberOfAces (Add card hand) | valueCard card == 11 = 1 + numberOfAces hand
 -- Determines whether the hand is bust and returns true/false given that is the case or not
 gameOver :: Hand -> Bool
 gameOver Empty = False
-gameOver (Add card hand) | value hand <= 21 = False
-                         | numberOfAces hand == 0 = True -- Value of hand is >21 here
-                         | otherwise = False -- The hand can't be a non-allowed combination of cards, because of aces
+gameOver hand | value hand <= 21 = False
+              | numberOfAces hand == 0 = True -- Value of hand is >21 here
+              | otherwise = False -- The hand can't be a non-allowed combination of cards, because of aces
 
 -- Given the guest hand and the bank hand, determines and returns the winner
 winner :: Hand -> Hand -> Player
@@ -119,9 +119,9 @@ playBank :: Hand -> Hand
 playBank deck = playBank' deck Empty
 
 playBank' :: Hand -> Hand -> Hand -- Deck, current hand and gives the final hand for the bank
-playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2 
-                                  | otherwise = h2
-                                  where (hand1, hand2) = draw h1 h2
+playBank' (Add c1 h1) h2 | value h2 < 16 = playBank' hand1 hand2 
+                         | otherwise = h2
+                         where (hand1, hand2) = draw h1 h2
 
 -- Takes the n:th card in the hand and returns it together with the remaining hand.
 -- indexed from 1 instead of 0.
