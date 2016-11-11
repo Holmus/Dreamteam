@@ -123,7 +123,8 @@ shuffle':: StdGen -> Hand -> Hand -> Hand
 shuffle' g Empty h2 = h2
 shuffle' g h1 h2 = shuffle' newG h3 (Add c1 h2)
     where (h3, c1) = takeNthCard value h1
-          (value, newG) = randomR (0, size h1) g
+          (value, newG) = randomR (1, size h1) g
+
 
 
 
