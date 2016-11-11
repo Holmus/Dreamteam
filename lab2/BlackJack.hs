@@ -113,7 +113,7 @@ fullDeck = foldr Add Empty
 draw :: Hand -> Hand -> (Hand,Hand) 
 draw Empty (Add c2 h2) = error "draw: The deck is empty."
 draw (Add c1 h1) Empty = (h1, (Add c1 Empty))
-draw (Add c1 h1) (Add c2 h2) = (h1, (Add c1 h2))
+draw (Add c1 h1) h2 = (h1, (Add c1 h2))
 
 playBank :: Hand -> Hand
 playBank deck = playBank' deck Empty
