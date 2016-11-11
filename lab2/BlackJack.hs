@@ -19,6 +19,20 @@ size hand2
 
 -- Task 3.3 start
 
+main :: IO ()
+main = runGame implementation
+
+implementation = Interface
+  { iEmpty    = empty
+  , iFullDeck = fullDeck
+  , iValue    = value
+  , iGameOver = gameOver
+  , iWinner   = winner 
+  , iDraw     = draw
+  , iPlayBank = playBank
+  , iShuffle  = shuffle
+  }
+
 -- Returns an empty hand
 empty :: Hand
 empty = Empty
@@ -69,6 +83,10 @@ hand1 = Add (Card Ace Hearts)
 
 hand2 = Add (Card Jack Hearts)
             (Add (Card (Numeric 5) Spades) Empty)
+hand3 = Add (Card Ace Hearts)
+            (Add (Card Jack Hearts) Empty)
+hand4 = Add (Card (Numeric 5) Spades) 
+            (Add (Card (Numeric 6) Spades) Empty)
 
 -- Given two hands <+ puts the first one on top of the second one
 
@@ -88,12 +106,13 @@ prop_size_onTopOf h1 h2 = size h1 + size h2 == size ((<+) h1 h2)
 
 fullDeck :: Hand
 fullDeck = foldr Add Empty
-			[Card rank suit | 
-            rank <- map Numeric [2..10]++[Jack,Queen,King,Ace], 
-            suit <- [Hearts, Spades, Diamonds, Clubs]]
+         [Card rank suit | 
+         rank <- map Numeric [2..10]++[Jack,Queen,King,Ace], 
+         suit <- [Hearts, Spades, Diamonds, Clubs]]
 
 draw :: Hand -> Hand -> (Hand,Hand) 
 draw Empty (Add c2 h2) = error "draw: The deck is empty."
+draw (Add c1 h1) Empty = (h1, (Add c1 Empty))
 draw (Add c1 h1) (Add c2 h2) = (h1, (Add c1 h2))
 
 playBank :: Hand -> Hand
@@ -101,8 +120,8 @@ playBank deck = playBank' deck Empty
 
 playBank' :: Hand -> Hand -> Hand -- Deck, current hand and gives the final hand for the bank
 playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2 
-								  | otherwise = h2
-		where (hand1, hand2) = draw h1 h2
+                                  | otherwise = h2
+                                  where (hand1, hand2) = draw h1 h2
 
 -- Takes the n:th card in the hand and returns it together with the remaining hand.
 -- indexed from 1 instead of 0.
@@ -114,7 +133,7 @@ takeNthCard 1 (Add c1 h1) = (h1, c1)
 takeNthCard n (Add c1 h1) | n <= 0 = error "You can't pick a card on a negative positon"
                           | otherwise = (((<+) (Add c1 Empty) remainingHand), tempCard)
                           where (remainingHand, tempCard) = takeNthCard (n-1) h1
-                 
+
 shuffle :: StdGen -> Hand -> Hand
 shuffle g Empty = Empty
 shuffle g hand = shuffle' g hand Empty
@@ -125,6 +144,7 @@ shuffle' g h1 h2 = shuffle' newG h3 (Add c1 h2)
     where (h3, c1) = takeNthCard value h1
           (value, newG) = randomR (1, size h1) g
 
-
-
+belongsTo :: Card -> Hand -> Bool
+c `belongsTo` Empty = False
+c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
 
