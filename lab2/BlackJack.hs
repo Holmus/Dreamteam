@@ -2,8 +2,12 @@
 module BlackJack where
 import Cards
 import RunGame
+import System.Random
 
 {-
+
+Task 3.2
+
 size hand2
   = size (Add (Card (Numeric 2) Hearts)
               (Add (Card Jack Spades) Empty))
@@ -13,6 +17,7 @@ size hand2
   = 2
 -}
 
+-- Task 3.3 start
 
 -- Returns an empty hand
 empty :: Hand
@@ -54,6 +59,8 @@ winner gHand bHand | gameOver gHand = Bank
                    | value bHand >= value gHand = Bank
                    | otherwise = Guest
 
+-- Task 3.3 End
+
 hand0 = Add (Card (Numeric 2) Hearts)
             (Add (Card Jack Spades) Empty)
 
@@ -69,7 +76,7 @@ hand2 = Add (Card Jack Hearts)
 (<+) Empty Empty = Empty
 (<+) Empty h2 = h2
 (<+) h1 Empty = h1
-(<+) (Add c1 h1) h2 = (Add c1 ((<+) h1 h2))  --(<+) h1 (Add c1 (Add c2 h2))   -- h1 (Add c1 h2) 
+(<+) (Add c1 h1) h2 = (Add c1 ((<+) h1 h2))
 
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 =
@@ -97,5 +104,25 @@ playBank' (Add c1 h1) (Add c2 h2) | value h2 < 16 = playBank' hand1 hand2
 								  | otherwise = h2
 		where (hand1, hand2) = draw h1 h2
 
+-- Takes the n:th card in the hand and returns it together with the remaining hand.
+-- indexed from 1 instead of 0.
+-- Only defined for n >= 1.
+
+--hand1 = Add (Card Ace Hearts) (Add (Card Ace Spades) Empty)
+takeNthCard :: Int -> Hand -> (Hand,Card)
+takeNthCard 1 (Add c1 h1) = (h1, c1)
+takeNthCard n (Add c1 h1) | n <= 0 = error "You can't pick a card on a negative positon"
+                          | otherwise = (((<+) (Add c1 Empty) remainingHand), tempCard)
+                          where (remainingHand, tempCard) = takeNthCard (n-1) h1
+{-                    
+shuffle :: StdGen -> Hand -> Hand
+shuffle g Empty = Empty
+shuffle g hand = shuffle' g hand Empty
+
+shuffle':: StdGen -> Hand -> Hand -> Hand
+shuffle' g Empty h2 = h2
+shuffle' g h1 h2 = shuffle' g h3 (Add c1 h2)
+    where (h3, c1) = takeNthCard g h1
+-}
 
 
