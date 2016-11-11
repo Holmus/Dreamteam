@@ -114,15 +114,16 @@ takeNthCard 1 (Add c1 h1) = (h1, c1)
 takeNthCard n (Add c1 h1) | n <= 0 = error "You can't pick a card on a negative positon"
                           | otherwise = (((<+) (Add c1 Empty) remainingHand), tempCard)
                           where (remainingHand, tempCard) = takeNthCard (n-1) h1
-{-                    
+                 
 shuffle :: StdGen -> Hand -> Hand
 shuffle g Empty = Empty
 shuffle g hand = shuffle' g hand Empty
 
 shuffle':: StdGen -> Hand -> Hand -> Hand
 shuffle' g Empty h2 = h2
-shuffle' g h1 h2 = shuffle' g h3 (Add c1 h2)
-    where (h3, c1) = takeNthCard g h1
--}
+shuffle' g h1 h2 = shuffle' newG h3 (Add c1 h2)
+    where (h3, c1) = takeNthCard value h1
+          (value, newG) = randomR (0, size h1) g
+
 
 
