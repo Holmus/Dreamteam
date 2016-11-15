@@ -61,12 +61,11 @@ value hand | totVal > 21 = totVal - ((numberOfAces hand) * 10)
 -- Determines and returns the number of aces in a hand
 numberOfAces :: Hand -> Integer
 numberOfAces Empty = 0
-numberOfAces (Add card hand) | valueCard card == 11 = 1 + numberOfAces hand
-                             | otherwise = numberOfAces hand
+numberOfAces (Add (Card Ace s) h) = 1 + numberOfAces h
+numberOfAces (Add c h) = numberOfAces h
 
 -- Determines whether the hand is bust and returns true/false given that is the case or not
 gameOver :: Hand -> Bool
-gameOver Empty = False
 gameOver hand | value hand <= 21 = False
               | otherwise = True -- The hand can't be a non-allowed combination of cards, because of aces
 
