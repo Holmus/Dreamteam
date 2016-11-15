@@ -78,8 +78,10 @@ winner gHand bHand | gameOver gHand = Bank
 
 -- Task 3.3 End
 
--- Given two hands <+ puts the first one on top of the second one
 
+-- Task B start
+
+-- Given two hands <+ puts the first one on top of the second one
 (<+) :: Hand -> Hand -> Hand
 (<+) Empty Empty = Empty
 (<+) Empty h2 = h2
