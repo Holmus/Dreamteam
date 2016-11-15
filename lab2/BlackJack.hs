@@ -47,12 +47,16 @@ valueRank _   = 10
 valueCard :: Card -> Integer
 valueCard (Card rank suit) = valueRank rank
 
+-- Calculates the value of a hand assuming aces = 11.
+value' :: Hand -> Integer
+value' Empty = 0
+value' (Add card hand) = valueCard card + value' hand      
+
 -- Determines and returns the value of a hand by utilizing the valueCard for each card
 value :: Hand -> Integer
-value Empty = 0
-value (Add card hand) | totVal > 21 = totVal - ((numberOfAces (Add card hand)) * 10)
-                      | otherwise = totVal
-                      where totVal = valueCard card + value hand
+value hand | totVal > 21 = totVal - ((numberOfAces hand) * 10)
+           | otherwise = totVal
+           where totVal = value' hand
 
 -- Determines and returns the number of aces in a hand
 numberOfAces :: Hand -> Integer
