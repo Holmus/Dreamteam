@@ -78,19 +78,6 @@ winner gHand bHand | gameOver gHand = Bank
 
 -- Task 3.3 End
 
-hand0 = Add (Card (Numeric 2) Hearts)
-            (Add (Card Jack Spades) Empty)
-
-hand1 = Add (Card Ace Hearts)
-            (Add (Card Ace Spades) Empty)
-
-hand2 = Add (Card Jack Hearts)
-            (Add (Card (Numeric 5) Spades) Empty)
-hand3 = Add (Card Ace Hearts)
-            (Add (Card Jack Hearts) Empty)
-hand4 = Add (Card (Numeric 5) Spades) 
-            (Add (Card (Numeric 6) Spades) Empty)
-
 -- Given two hands <+ puts the first one on top of the second one
 
 (<+) :: Hand -> Hand -> Hand
