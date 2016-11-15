@@ -63,8 +63,7 @@ numberOfAces (Add card hand) | valueCard card == 11 = 1 + numberOfAces hand
 gameOver :: Hand -> Bool
 gameOver Empty = False
 gameOver hand | value hand <= 21 = False
-              | numberOfAces hand == 0 = True -- Value of hand is >21 here
-              | otherwise = False -- The hand can't be a non-allowed combination of cards, because of aces
+              | otherwise = True -- The hand can't be a non-allowed combination of cards, because of aces
 
 -- Given the guest hand and the bank hand, determines and returns the winner
 winner :: Hand -> Hand -> Player
