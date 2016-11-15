@@ -52,6 +52,16 @@ checkSameColSizeRec s i | length (rows s) >= 1 =
                        && checkSameColSizeRec (Sudoku (drop 1 (rows s))) i
                         | otherwise = True
 
+isEleNothing :: Maybe Int -> Bool
+isEleNothing m | m == Nothing = True
+               | otherwise = False
+
+
+isSolved :: Sudoku -> Bool
+isSolved s | length (rows s) == 0 = True
+isSolved s = all isEleNothing (head (rows s)) 
+             && isSolved (Sudoku (drop 1 (rows s)))
+
 
 
 
