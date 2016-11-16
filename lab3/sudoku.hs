@@ -8,7 +8,7 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
 ex1 = [Just 3, Just 9, Just 10, Nothing, Just 0]
 ex2 = Sudoku [[Just 3, Just 4, Just 5],
               [Just 3, Just 4, Just 5],
-              [Just 3, Just 4, Nothing]  
+              [Just 3, Just 4, Just 5]  
             ]
 
 example =
@@ -36,7 +36,10 @@ isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
                     == 81 
         where oneArray = concat (rows s)
 
--- We here assume that it's a valid sudoku if you send it in. 
+-- For the sudoku to be solved it needs to be a legit sudoku, 
+-- then it can not contain any element of nothing. 
 isSolved :: Sudoku -> Bool
-isSolved s =  notElem Nothing (concat (rows s))
+isSolved s = isSolved s && notElem Nothing (concat (rows s))
+
+
 
