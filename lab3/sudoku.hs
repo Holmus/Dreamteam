@@ -1,6 +1,6 @@
 import Data.Maybe
 import Data.Char
-import Data.List.Split
+
 
 
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
@@ -74,7 +74,6 @@ createSudoku :: String -> Sudoku
 createSudoku s | isSudoku sudoku = sudoku
                | otherwise = error "The provided file is not a sudoku"
                where sudoku =  Sudoku ([[charToMaybe i | i <- x]| x <- words s])
-
 
 
 
