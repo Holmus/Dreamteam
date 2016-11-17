@@ -55,12 +55,6 @@ printSudoku :: Sudoku -> IO ()
 printSudoku s | (rows s) == [] = return ()
               | otherwise = putStr (convertToString (map (map printFormat) (rows s)))
 
-{--
-Alternative solution with map, should be deleted.
-readSudoku :: FilePath -> IO Sudoku
-readSudoku path = do string <- readFile path
-                     return (Sudoku (map (map charToMaybe) (splitOn "\n" string)))
---}
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do string <- readFile path
                      return (createSudoku string)
