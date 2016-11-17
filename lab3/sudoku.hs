@@ -1,5 +1,6 @@
 import Data.Maybe
-
+import Data.Char
+import Data.List.Split
 
 
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
@@ -34,12 +35,47 @@ isSudoku :: Sudoku -> Bool
 isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
                     ++ [y | y <- oneArray, y == Nothing])
                     == 81 
-        where oneArray = concat (rows s)
+             where oneArray = concat (rows s)
 
 -- For the sudoku to be solved it needs to be a legit sudoku, 
 -- then it can not contain any element of nothing. 
 isSolved :: Sudoku -> Bool
 isSolved s = isSolved s && notElem Nothing (concat (rows s))
+
+printFormat :: Maybe Int -> Char
+printFormat (Just x) = intToDigit x
+printFormat Nothing = '.'
+
+convertToString :: [[Char]] -> String
+convertToString (x:[]) = x ++ "\n"
+convertToString (x:xs) = x ++ "\n" ++ convertToString xs
+
+
+printSudoku :: Sudoku -> IO ()
+printSudoku s | (rows s) == [] = return ()
+              | otherwise = putStr (convertToString (map (map printFormat) (rows s)))
+
+{--
+Alternative solution with map, should be deleted.
+readSudoku :: FilePath -> IO Sudoku
+readSudoku path = do string <- readFile path
+                     return (Sudoku (map (map charToMaybe) (splitOn "\n" string)))
+--}
+readSudoku :: FilePath -> IO Sudoku
+readSudoku path = do string <- readFile path
+                     return (Sudoku (test2 string))
+
+
+charToMaybe :: Char -> Maybe Int
+charToMaybe c | c == '.' = Nothing
+              | isDigit c = (Just (digitToInt c)) 
+
+--Rename this file
+test2 :: String -> [[Maybe Int]]
+test2 s = [[charToMaybe i | i <- x]| x <- words s]
+
+
+
 
 
 
