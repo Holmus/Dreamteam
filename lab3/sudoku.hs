@@ -70,7 +70,7 @@ charToMaybe :: Char -> Maybe Int
 charToMaybe c | c == '.' = Nothing
               | isDigit c = (Just (digitToInt c)) 
 
---Rename this file
+--Rename this function
 test2 :: String -> [[Maybe Int]]
 test2 s = [[charToMaybe i | i <- x]| x <- words s]
 
