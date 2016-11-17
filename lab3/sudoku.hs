@@ -63,16 +63,17 @@ readSudoku path = do string <- readFile path
 --}
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do string <- readFile path
-                     return (Sudoku (test2 string))
-
+                     return (createSudoku string)
 
 charToMaybe :: Char -> Maybe Int
 charToMaybe c | c == '.' = Nothing
               | isDigit c = (Just (digitToInt c)) 
 
---Rename this function
-test2 :: String -> [[Maybe Int]]
-test2 s = [[charToMaybe i | i <- x]| x <- words s]
+
+createSudoku :: String -> Sudoku
+createSudoku s | isSudoku sudoku = sudoku
+               | otherwise = error "The provided file is not a sudoku"
+               where sudoku =  Sudoku ([[charToMaybe i | i <- x]| x <- words s])
 
 
 
