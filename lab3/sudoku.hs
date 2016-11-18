@@ -1,6 +1,6 @@
 import Data.Maybe
 import Data.Char
-
+import Test.QuickCheck
 
 
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
@@ -24,9 +24,7 @@ example =
     , [Nothing,Just 8, Just 3, Nothing,Nothing,Nothing,Nothing,Just 6, Nothing]
     , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 9]
     ]
---A1
---let a = [(Just x) | (Just x) <- ex1,  x < 10 && x > 0] ++ [y | y <- ex1, y == Nothing]
-
+--A
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 
@@ -42,6 +40,8 @@ isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
 isSolved :: Sudoku -> Bool
 isSolved s = isSolved s && notElem Nothing (concat (rows s))
 
+
+--B
 printFormat :: Maybe Int -> Char
 printFormat (Just x) = intToDigit x
 printFormat Nothing = '.'
@@ -69,7 +69,13 @@ createSudoku s | isSudoku sudoku = sudoku
                | otherwise = error "The provided file is not a sudoku"
                where sudoku =  Sudoku ([[charToMaybe i | i <- x]| x <- words s])
 
-
-
+--C
+cell :: Gen (Maybe Int)
+cell =  elements ((map Just [1..9]) ++ [Nothing])
+       
+instance Arbitrary Sudoku where
+  arbitrary =
+    do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
+       return (Sudoku rows)
 
 
