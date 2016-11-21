@@ -8,10 +8,11 @@ data Sudoku = Sudoku { rows :: [[Maybe Int]] }
                 deriving Show
 
 ex1 = [Just 3, Just 9, Just 10, Nothing, Just 0]
-ex2 = Sudoku [[Just 3, Just 4, Just 5],
+ex2 = Sudoku [
+              [Just 3, Just 4, Just 5],
               [Just 3, Just 4, Just 5],
               [Just 3, Just 4, Just 5]  
-            ]
+             ]
 
 example =
    Sudoku
@@ -91,6 +92,23 @@ type Block = [Maybe Int]
 isOkayBlock :: Block -> Bool
 isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
                     where numBlock = filter (\a -> if a == Nothing then False else True) block
+
+blocks :: Sudoku -> [Block]
+blocks s | isSudoku s = undefined
+
+getRows :: Sudoku -> [Block]
+getRows s = rows s
+
+getColums :: Sudoku -> [Block]
+getColums s = transpose (rows s)
+
+--getSquares :: Sudoku -> [Block]
+
+
+
+
+
+
 
 
 
