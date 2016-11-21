@@ -1,6 +1,7 @@
 import Data.Maybe
 import Data.Char
 import Test.QuickCheck
+import Data.List
 
 
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
@@ -83,5 +84,13 @@ instance Arbitrary Sudoku where
 
 prop_Sudoku :: Sudoku -> Bool
 prop_Sudoku s = isSudoku s
+
+--D
+type Block = [Maybe Int]  
+
+isOkayBlock :: Block -> Bool
+isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
+                    where numBlock = filter (\a -> if a == Nothing then False else True) block
+
 
 
