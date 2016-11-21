@@ -71,11 +71,17 @@ createSudoku s | isSudoku sudoku = sudoku
 
 --C
 cell :: Gen (Maybe Int)
-cell =  elements ((map Just [1..9]) ++ [Nothing])
-       
+cell =  frequency [(1,randomJust),(9,elements [Nothing])]
+
+randomJust :: Gen (Maybe Int)
+randomJust = elements [Just i | i <- [1..9]]
+
 instance Arbitrary Sudoku where
   arbitrary =
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
+
+prop_Sudoku :: Sudoku -> Bool
+prop_Sudoku s = isSudoku s
 
 
