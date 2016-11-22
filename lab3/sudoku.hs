@@ -107,20 +107,6 @@ getColums s = transpose (rows s)
 getSquare :: [Block] -> Int -> Int -> Block
 getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
 
-getSquare' :: [Block] -> Int -> [Block]
-getSquare' block i | i > 0 = [a ++ a1 ++ a2] `conc` getSquare' ([b] `conc` [b1] `conc` [b2] `conc` c) (i-1) 
-                   | otherwise = [[]] 
-                    where (a,b)   = splitAt 3 ((take 3 block)!!0)
-                          (a1,b1) = splitAt 3 ((take 3 block)!!1)
-                          (a2,b2) = splitAt 3 ((take 3 block)!!2)
-                          c       = drop 3 block 
-
-conc :: [Block] -> [Block] -> [Block]
-conc [[]] b = b
-conc  b [[]] = b
-conc a b = a ++ b
-
-
 
                     
 
