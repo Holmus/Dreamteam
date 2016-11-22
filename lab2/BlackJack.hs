@@ -4,6 +4,7 @@ import Cards
 import RunGame
 import System.Random
 
+
 {-
 
 Task 3.2
@@ -83,7 +84,6 @@ winner gHand bHand | gameOver gHand = Bank
 
 -- Given two hands <+ puts the first one on top of the second one
 (<+) :: Hand -> Hand -> Hand
-(<+) Empty Empty = Empty
 (<+) Empty h2 = h2
 (<+) h1 Empty = h1
 (<+) (Add c1 h1) h2 = (Add c1 ((<+) h1 h2))
@@ -103,8 +103,7 @@ fullDeck = foldr Add Empty
          suit <- [Hearts, Spades, Diamonds, Clubs]]
 
 draw :: Hand -> Hand -> (Hand,Hand) 
-draw Empty (Add c2 h2) = error "draw: The deck is empty."
-draw (Add c1 h1) Empty = (h1, (Add c1 Empty))
+draw Empty _ = error "draw: The deck is empty."
 draw (Add c1 h1) h2 = (h1, (Add c1 h2))
 
 playBank :: Hand -> Hand
@@ -136,7 +135,14 @@ shuffle' g h1 h2 = shuffle' newG h3 (Add c1 h2)
     where (h3, c1) = takeNthCard value h1
           (value, newG) = randomR (1, size h1) g
 
+prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
+prop_shuffle_sameCards g c h =
+    c `belongsTo` h == c `belongsTo` shuffle g h
+
 belongsTo :: Card -> Hand -> Bool
 c `belongsTo` Empty = False
 c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
+
+prop_size_shuffle :: StdGen -> Hand -> Bool
+prop_size_shuffle g h = size h == size (shuffle g h)
 
