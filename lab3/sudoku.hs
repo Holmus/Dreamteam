@@ -96,7 +96,7 @@ isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
 
 blocks :: Sudoku -> [Block]
 blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
-          where squares = [getSquare (rows s) x y | x <- [0,3,6], y <- [0,3,6]]
+          where squares = [getSquare (rows s) x y | x <- [0,3,6], y <- [0,3,6]
 
 getRows :: Sudoku -> [Block]
 getRows s = rows s
@@ -107,18 +107,13 @@ getColums s = transpose (rows s)
 getSquare :: [Block] -> Int -> Int -> Block
 getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
 
---rad1 (a,b)
---rad2 (a1,b1)
---rad3 (a2,b2)
---Resten c
-
-
-getSquare' :: [Block] -> [Block]
-getSquare' block | (length (c!!0)) > 0 = [a ++ a1 ++ a2] ++ getSquare' ([b] `conc` [b1] `conc` [b2] `conc` c)  
-                                    where (a,b)   = splitAt 3 ((take 3 block)!!0)
-                                          (a1,b1) = splitAt 3 ((take 3 block)!!1)
-                                          (a2,b2) = splitAt 3 ((take 3 block)!!2)
-                                          c       = drop 3 block 
+getSquare' :: [Block] -> Int -> [Block]
+getSquare' block i | i > 0 = [a ++ a1 ++ a2] `conc` getSquare' ([b] `conc` [b1] `conc` [b2] `conc` c) (i-1) 
+                   | otherwise = [[]] 
+                    where (a,b)   = splitAt 3 ((take 3 block)!!0)
+                          (a1,b1) = splitAt 3 ((take 3 block)!!1)
+                          (a2,b2) = splitAt 3 ((take 3 block)!!2)
+                          c       = drop 3 block 
 
 conc :: [Block] -> [Block] -> [Block]
 conc [[]] b = b
