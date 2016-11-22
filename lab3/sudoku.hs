@@ -26,6 +26,7 @@ example =
     , [Nothing,Just 8, Just 3, Nothing,Nothing,Nothing,Nothing,Just 6, Nothing]
     , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 9]
     ]
+
 --A
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
@@ -94,7 +95,8 @@ isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
                     where numBlock = filter (\a -> if a == Nothing then False else True) block
 
 blocks :: Sudoku -> [Block]
-blocks s | isSudoku s = undefined
+blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
+          where squares = [getSquare (rows s) x y | x <- [0,3,6], y <- [0,3,6]]
 
 getRows :: Sudoku -> [Block]
 getRows s = rows s
@@ -102,13 +104,30 @@ getRows s = rows s
 getColums :: Sudoku -> [Block]
 getColums s = transpose (rows s)
 
---getSquares :: Sudoku -> [Block]
+getSquare :: [Block] -> Int -> Int -> Block
+getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
+
+--rad1 (a,b)
+--rad2 (a1,b1)
+--rad3 (a2,b2)
+--Resten c
+
+
+getSquare' :: [Block] -> [Block]
+getSquare' block | (length (c!!0)) > 0 = [a ++ a1 ++ a2] ++ getSquare' ([b] `conc` [b1] `conc` [b2] `conc` c)  
+                                    where (a,b)   = splitAt 3 ((take 3 block)!!0)
+                                          (a1,b1) = splitAt 3 ((take 3 block)!!1)
+                                          (a2,b2) = splitAt 3 ((take 3 block)!!2)
+                                          c       = drop 3 block 
+
+conc :: [Block] -> [Block] -> [Block]
+conc [[]] b = b
+conc  b [[]] = b
+conc a b = a ++ b
 
 
 
-
-
-
+                    
 
 
 
