@@ -24,7 +24,7 @@ example =
     , [Just 2, Just 7, Nothing,Just 4, Just 6, Nothing,Nothing,Nothing,Nothing]
     , [Nothing,Nothing,Just 5, Just 3, Nothing,Just 8, Just 9, Nothing,Nothing]
     , [Nothing,Just 8, Just 3, Nothing,Nothing,Nothing,Nothing,Just 6, Nothing]
-    , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 9]
+    , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 3]
     ]
 
 --A
@@ -96,7 +96,7 @@ isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
 
 blocks :: Sudoku -> [Block]
 blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
-          where squares = [getSquare (rows s) x y | x <- [0,3,6], y <- [0,3,6]
+          where squares = [getSquare (rows s) x y | x <- [0,3,6], y <- [0,3,6]]
 
 getRows :: Sudoku -> [Block]
 getRows s = rows s
@@ -107,8 +107,5 @@ getColums s = transpose (rows s)
 getSquare :: [Block] -> Int -> Int -> Block
 getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
 
-
-                    
-
-
-
+isOkay :: Sudoku -> Bool
+isOkay s = and (map isOkayBlock (rows s))
