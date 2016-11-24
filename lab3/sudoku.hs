@@ -13,7 +13,6 @@ ex2 = Sudoku [
               [Just 3, Just 4, Just 5],
               [Just 3, Just 4, Just 5]  
              ]
-
 example =
    Sudoku
     [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing]
@@ -135,11 +134,34 @@ blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) (col,el))))
 
+--E4
+
+candidates :: Sudoku -> Pos -> [Int]
+candidates sud (x,y) = intersect
+                                (intersect (checkBlock row y) (checkBlock col x))
+                                (checkBlock square sqPos) 
+                       where block = blocks sud
+                             sqPos = getSquarePos (x,y)
+                             row   = block!!x
+                             col   = block!!(9 + y)
+                             square= block!!(18 + sqPos)    
+
+--Finds which block the x,y position belongs to. 
+getSquarePos :: Pos -> Int
+getSquarePos (x,y) = (x`div`3)*3 + y`div`3
+
+checkBlock :: [Maybe Int] -> Int -> [Int]
+checkBlock arr pos = [ y | y <- [0..8], isOkayBlock ((!!=) arr (pos,Just y))]
+
+-- F1
+solve :: Sudoku -> Maybe Sudoku
+solve s | not (isSudoku s && isOkay s) = Nothing
+        | otherwise = solve' s
 
 
-
-
-
+solve' :: Sudoku -> Maybe Sudoku
+solve' (Sudoku rows) = undefined
+                    
 
 
 
