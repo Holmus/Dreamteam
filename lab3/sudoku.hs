@@ -138,13 +138,13 @@ update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) 
 
 candidates :: Sudoku -> Pos -> [Int]
 candidates sud (x,y) = intersect
-                                (intersect (checkBlock row y) (checkBlock col x))
-                                (checkBlock square sqPos) 
+                        (intersect (checkBlock row y) (checkBlock col x))
+                        (checkBlock square sqPos) 
                        where block = blocks sud
                              sqPos = getSquarePos (x,y)
                              row   = block!!x
                              col   = block!!(9 + y)
-                             square= block!!(18 + sqPos)    
+                             square= block!!(18 + sqPos)   
 
 --Finds which block the x,y position belongs to. 
 getSquarePos :: Pos -> Int
