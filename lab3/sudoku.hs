@@ -120,19 +120,27 @@ type Pos = (Int,Int)
 blanks :: Sudoku -> [Pos]
 blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 
-
-
 --E2
 --Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) (x:xs) (i,el) | i < 0 = error "You can't replace a negative element in the list"
-                    | ((length (x:xs) - 1) < i) =
+                    | (length (x:xs) - 1) < i =
                       error "You can't remove an element which is outside of the list"
                     | i == 0 = el:xs
                     | otherwise = x:((!!=) xs (i-1,el))
 
 
 --E3
+
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
-update s (x,y) el = undefined
+update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) (col,el))))
+
+
+
+
+
+
+
+
+
 
