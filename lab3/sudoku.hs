@@ -13,6 +13,8 @@ ex2 = Sudoku [
               [Just 3, Just 4, Just 5],
               [Just 3, Just 4, Just 5]  
              ]
+
+
 example =
   Sudoku
     [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing]
@@ -154,18 +156,24 @@ prop_update_correctVal s (row,col) el = (rows (update s (row,col) el))!!row!!col
 candidates :: Sudoku -> Pos -> [Int]
 candidates sud (x,y) | isSudoku sud = intersect
                         (intersect (checkBlock row y) (checkBlock col x))
-                        (checkBlock square sqPos) 
+                        (checkBlock square arPos) 
                      | otherwise = []  
                        where block = blocks sud
                              sqPos = getSquarePos (x,y)
+                             arPos = getArrPos (x,y)
                              row   = block!!x
                              col   = block!!(9 + y)
                              square= block!!(18 + sqPos) 
 
 
---Finds which block the x,y position belongs to. 
+--Finds which of the 9x9 block the x,y position belongs to. 
 getSquarePos :: Pos -> Int
 getSquarePos (x,y) = (x`div`3)*3 + y`div`3
+
+--Find which position in the array of a 3x3 block a position has
+getArrPos :: Pos -> Int
+getArrPos (x,y) = x `mod` 3 * 3 + y `mod` 3
+
 
 checkBlock :: [Maybe Int] -> Int -> [Int]
 checkBlock arr pos = [ y | y <- [1..9], isOkayBlock ((!!=) arr (pos,Just y))]
