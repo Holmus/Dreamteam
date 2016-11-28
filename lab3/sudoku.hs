@@ -163,7 +163,6 @@ candidates sud (x,y) | isSudoku sud = intersect
                              square= block!!(18 + sqPos) 
 
 
-
 --Finds which block the x,y position belongs to. 
 getSquarePos :: Pos -> Int
 getSquarePos (x,y) = (x`div`3)*3 + y`div`3
@@ -173,5 +172,36 @@ checkBlock arr pos = [ y | y <- [1..9], isOkayBlock ((!!=) arr (pos,Just y))]
 
 -- F1
 
+solve :: Sudoku -> Maybe Sudoku
+solve s | isSudoku s && isOkay s = solve' s (blanks s)
+        | otherwise = Nothing
 
+solve' :: Sudoku -> [Pos] -> Maybe Sudoku
+solve' s [] = Just s        
+solve' s (fBlank:rBlank) = listToMaybe $ catMaybes 
+                           [ solve' x rBlank | x <- 
+                            [update s fBlank (Just cand) | cand <- candidates s fBlank]
+                           ]  
+        
+-- F2        
+readAndSolve :: FilePath -> IO ()
+readAndSolve path = do 
+                        s <- readSudoku path
+                        let temp = solve s
+                        if (isNothing temp)
+                           then putStr "(No Solution) \n"
+                        else printSudoku (fromJust (temp))
+
+-- F3
+isSolutionOf :: Sudoku -> Sudoku -> Bool
+isSolutionOf s1 s2 = isSolved s1 && isSolutionOf' s1 s2
+
+isSolutionOf' :: Sudoku -> Sudoku -> Bool
+isSolutionOf' (Sudoku s1) (Sudoku s2) = all (\(x,y) -> if s1!!x!!y == s2!!x!!y then True else False) $
+                                  [(x,y) | x <- [0..8], y <- [0..8], notElem (x,y) $ blanks (Sudoku s2)]
+
+-- F4 
+
+prop_SolveSound :: Sudoku -> Property
+prop_SolveSound s = undefined
 
