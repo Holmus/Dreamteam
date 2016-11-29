@@ -159,23 +159,7 @@ prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blan
                     | otherwise = x:((!!=) xs (i-1,el))
 
 
-{-
-
-OLD SOLUTION SHOULD BE REMOVED BEFORE HANDING IN!
-
-validTestInput :: [a] -> (Int,a) -> Bool 
-validTestInput arr (i,el) = i >= 0 && i < length arr
-
-prop_replace_length :: [a] -> (Int,a) -> Property
-prop_replace_length arr (i,el) = validTestInput arr (i,el) ==>
-                                 length arr == length (arr !!= (i,el))
-
-prop_replace_correct :: Eq a => [a] -> (Int,a) -> Property
-prop_replace_correct arr (i,el) = validTestInput arr (i,el)  ==> (!!=) arr (i,el)!!i == el && 
-                                  and [True | j <- [0..((length arr)-1)],not (j == i)]
- 
- -}
--- Instead of validTestInput, doesn't work for empty list.  
+-- Creates valid test input for prop_replace_*, doesn't work for empty list.  
 rInt :: [a] -> Gen Int
 rInt arr = do
               x <- elements [0..((length arr)-1)]
@@ -205,8 +189,8 @@ rPos = do
       
 prop_update_correctVal :: Sudoku -> Maybe Int -> Property
 prop_update_correctVal s el = forAll rPos update'
-                                where update' (x,y) = (rows (update s (x,y) el))!!x!!y == el 
-
+  where update' (x,y) = upArr(x,y)!!x!!y == el 
+        upArr   (x,y) = (rows (update s (x,y) el))
 --E4
   
 candidates :: Sudoku -> Pos -> [Int]
@@ -221,12 +205,16 @@ candidates sud (x,y) | isSudoku sud = intersect
                              col   = block!!(9 + y)
                              square= block!!(18 + sqPos) 
 
-{-prop_candidates_allowed :: Sudoku -> Pos -> Bool
-prop_candidates_allowed sud (x,y) | length cs == 0 = not (isSudoku sud) || isSolved sud
-                                  | otherwise = isSudoku $ update sud (x,y) Just i | i <- cs
-                                  where cs = candidates sud (x,y)-}
+rBlank :: Sudoku -> Gen Pos
+rBlank s = do
+              (x,y) <- elements (blanks s)
+              return (x,y)
 
-
+prop_candidates :: Sudoku -> Property
+prop_candidates sud = isOkay sud ==> forAll (rBlank sud) candidates'
+  where allOkay arr     = and $ map isOkay arr
+        candidates' pos = allOkay [update sud pos (Just c) | c <- candidates sud pos]
+        
 --Finds which of the 9x9 block the x,y position belongs to. 
 getSquarePos :: Pos -> Int
 getSquarePos (x,y) = (x`div`3)*3 + y`div`3
@@ -266,13 +254,15 @@ isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf s1 s2 = isSolved s1 && isSolutionOf' s1 s2
 
 isSolutionOf' :: Sudoku -> Sudoku -> Bool
-isSolutionOf' (Sudoku s1) (Sudoku s2) = all (\(x,y) -> if s1!!x!!y == s2!!x!!y then True else False) $
-                                  [(x,y) | x <- [0..8], y <- [0..8], notElem (x,y) $ blanks (Sudoku s2)]
+isSolutionOf' (Sudoku s1) (Sudoku s2) = 
+  all (\(x,y) -> if s1!!x!!y == s2!!x!!y then True else False) $
+  [(x,y) | x <- [0..8], y <- [0..8], notElem (x,y) $ blanks (Sudoku s2)]
 
 -- F4 
 
 prop_SolveSound :: Sudoku -> Property
-prop_SolveSound s = not (isNothing (solution)) ==>  property $ isSolved $ fromJust $ solution
+prop_SolveSound s = not (isNothing (solution)) ==>  property $ isSolved $
+                    fromJust $ solution
                     where solution = solve s 
 
 
