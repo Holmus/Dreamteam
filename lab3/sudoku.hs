@@ -36,7 +36,7 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 isSudoku :: Sudoku -> Bool
 isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
                     ++ [y | y <- oneArray, y == Nothing])
-                    == 81
+                    == 81 && length (getRows s) == 9
              where oneArray = concat (rows s)
 
 -- For the sudoku to be solved it needs to be a legit sudoku, that is, it can contain no "Nothing"-elements and has to consist of 1-9's solely.
