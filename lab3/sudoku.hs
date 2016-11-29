@@ -132,7 +132,7 @@ isOkay s = and (map isOkayBlock (rows s))
 --E, tuple of ints, represents a position.
 type Pos = (Int,Int)
 
---E1
+-- E1
 
 -- Finds and returns all Nothings as an array of Pos's,
 blanks :: Sudoku -> [Pos]
@@ -142,9 +142,15 @@ blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 prop_blanks_allBlank :: Sudoku -> Bool
 prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blanks (Sudoku rows)) 
 
+<<<<<<< Updated upstream
 --E2
 -- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
 -- Replaces an element in the provided array at the provided position with the provided element, then returns the updated array.
+=======
+-- E2
+-- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
+
+>>>>>>> Stashed changes
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) [] _          = [] 
 (!!=) (x:xs) (i,el) | i < 0 || (length (x:xs) - 1) < i =
@@ -152,8 +158,22 @@ prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blan
                     | i == 0 = el:xs
                     | otherwise = x:((!!=) xs (i-1,el))
 
+validTestInput :: [a] -> (Int,a) -> Bool 
+validTestInput arr (i,el) = i >= 0 && i < length arr
 
---Write prop replace
+prop_replace_length :: [a] -> (Int,a) -> Bool
+prop_replace_length arr (i,el) = i >= 0 && i < length arr ==>
+                                 length arr == length (arr !!= (i,el))
+
+
+prop_replace_correct :: [a] -> (Int,a) -> Bool
+prop_replace_correct arr (i,el) = validTestInput arr (i,el) ==> 
+                                  (replaced)!!i == el &&
+                                  length arr == length ([j | j <- [0..((length arr) -1)],replaced!!j == arr!!j]) -1
+                                  where replaced = arr !!= (i,el)
+
+
+
 
 
 --E3
@@ -167,12 +187,12 @@ prop_update_correctVal :: Sudoku -> (Positive Int, Positive Int) -> Maybe Int ->
 prop_update_correctVal s (row,col) el = (rows (update s (row,col) el))!!row!!col == el
 -}
 --E4
-
+  
 candidates :: Sudoku -> Pos -> [Int]
 candidates sud (x,y) | isSudoku sud = intersect
                         (intersect (checkBlock row y) (checkBlock col x))
                         (checkBlock square arPos) 
-                     | otherwise = []  
+                     | otherwise   = []  
                        where block = blocks sud
                              sqPos = getSquarePos (x,y)
                              arPos = getArrPos (x,y)
