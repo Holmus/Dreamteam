@@ -165,13 +165,10 @@ prop_replace_length :: [a] -> (Int,a) -> Property
 prop_replace_length arr (i,el) = validTestInput arr (i,el) ==>
                                  length arr == length (arr !!= (i,el))
 
-
 prop_replace_correct :: Eq a => [a] -> (Int,a) -> Property
 prop_replace_correct arr (i,el) = validTestInput arr (i,el)  ==> (!!=) arr (i,el)!!i == el && 
                                   and [True | j <- [0..((length arr)-1)],not (j == i)]
-
-
-
+ 
 --E3
 
 -- 
