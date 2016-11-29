@@ -142,15 +142,15 @@ blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 prop_blanks_allBlank :: Sudoku -> Bool
 prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blanks (Sudoku rows)) 
 
-<<<<<<< Updated upstream
+
 --E2
 -- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
 -- Replaces an element in the provided array at the provided position with the provided element, then returns the updated array.
-=======
+
 -- E2
 -- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
 
->>>>>>> Stashed changes
+
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) [] _          = [] 
 (!!=) (x:xs) (i,el) | i < 0 || (length (x:xs) - 1) < i =
