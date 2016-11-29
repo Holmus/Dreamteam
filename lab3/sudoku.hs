@@ -158,6 +158,11 @@ prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blan
                     | i == 0 = el:xs
                     | otherwise = x:((!!=) xs (i-1,el))
 
+
+{-
+
+OLD SOLUTION SHOULD BE REMOVED BEFORE HANDING IN!
+
 validTestInput :: [a] -> (Int,a) -> Bool 
 validTestInput arr (i,el) = i >= 0 && i < length arr
 
@@ -169,21 +174,38 @@ prop_replace_correct :: Eq a => [a] -> (Int,a) -> Property
 prop_replace_correct arr (i,el) = validTestInput arr (i,el)  ==> (!!=) arr (i,el)!!i == el && 
                                   and [True | j <- [0..((length arr)-1)],not (j == i)]
  
+ -}
+-- Instead of validTestInput, doesn't work for empty list.  
+rInt :: [a] -> Gen Int
+rInt arr = do
+              x <- elements [0..((length arr)-1)]
+              return x
+
+
+prop_replace_length' :: [a] -> a -> Property
+prop_replace_length' arr el = forAll (rInt arr) test
+                              where test i = length arr == length (arr !!= (i,el))
+
+prop_replace_correct' :: Eq a => [a] -> a -> Property  
+prop_replace_correct' [] el  = property ((!!=) [] (0,el) == [])  
+prop_replace_correct' arr el = forAll (rInt arr) test
+                                  where test i = (!!=) arr (i,el)!!i == el && and [True | j <- [0..((length arr)-1)],not (j == i)]
+
 --E3
-
-rPos :: Gen Pos
-rPos = (fromIntegral (elements [0..8]),fromIntegral (elements [0..8]))
-
-
 
 -- 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) (col,el))))
 
-prop_update_correctVal :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_update_correctVal s (row,col) el = rows (update s (mRow,mCol) el)!!mRow!!mCol == el
-                                        where mRow = (abs row) `mod` 9
-                                              mCol = (abs col) `mod` 9
+rPos :: Gen Pos
+rPos = do
+          x <- elements [0..8]
+          y <- elements [0..8]
+          return (x,y)
+      
+prop_update_correctVal :: Sudoku -> Maybe Int -> Property
+prop_update_correctVal s el = forAll rPos update'
+                                where update' (x,y) = (rows (update s (x,y) el))!!x!!y == el 
 
 --E4
   
