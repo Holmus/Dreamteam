@@ -223,7 +223,7 @@ isSolutionOf' (Sudoku s1) (Sudoku s2) = all (\(x,y) -> if s1!!x!!y == s2!!x!!y t
 
 prop_SolveSound :: Sudoku -> Property
 prop_SolveSound s = not (isNothing (solution)) ==>  property $ isSolved $ fromJust $ solution
-                  where solution = solve s 
+                    where solution = solve s 
 
 
 fewerChecks prop = quickCheckWith stdArgs{ maxSuccess = 30 } prop
