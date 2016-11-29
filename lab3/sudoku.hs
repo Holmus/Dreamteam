@@ -100,7 +100,7 @@ isOkayBlock :: Block -> Bool
 isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
                     where numBlock = filter (\a -> if a == Nothing then False else True) block
 
--- Creates blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
+-- Creates an array of blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
 -- Utilizes getRows, getColumns and getSquare
 blocks :: Sudoku -> [Block]
 blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
@@ -119,29 +119,32 @@ getColums s = transpose (rows s)
 getSquare :: [Block] -> Int -> Int -> Block
 getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
 
--- 
+-- Verifies that the number of cells are correct, that is, the blocks function should consist of 27x9 elements. 
 prop_blocks_amountOfCells :: Sudoku -> Bool
 prop_blocks_amountOfCells (Sudoku rows) = length (blocks (Sudoku rows)) == 27
                                         && all (\a -> if length a == 9 then True else False) rows
 
+-- Checks through all rows and verifies that they are okay blocks, thus the whole sudoku is okay.
 isOkay :: Sudoku -> Bool
 isOkay s = and (map isOkayBlock (rows s))
 
 
---E
-
+--E, tuple of ints, represents a position.
 type Pos = (Int,Int)
 
 --E1
 
+-- Finds and returns all Nothings as an array of Pos's,
 blanks :: Sudoku -> [Pos]
 blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 
+-- For a provided position, finds all nothing positions and verifies for each of those that they are indeed, nothing.
 prop_blanks_allBlank :: Sudoku -> Bool
 prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blanks (Sudoku rows)) 
 
 --E2
---Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
+-- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
+-- Replaces an element in the provided array at the provided position with the provided element, then returns the updated array.
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) [] _          = [] 
 (!!=) (x:xs) (i,el) | i < 0 || (length (x:xs) - 1) < i =
@@ -155,6 +158,7 @@ prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blan
 
 --E3
 
+-- 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) (col,el))))
 
