@@ -17,7 +17,7 @@ ex2 = Sudoku [
 
 example =
   Sudoku
-    [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 2, Nothing,Nothing,Nothing]
+    [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing]
     , [Nothing,Just 5, Nothing,Nothing,Nothing,Nothing,Just 1, Just 8, Nothing]
     , [Nothing,Nothing,Just 9, Just 2, Nothing,Just 4, Just 7, Nothing,Nothing]
     , [Nothing,Nothing,Nothing,Nothing,Just 1, Just 3, Nothing,Just 2, Just 8]
@@ -126,7 +126,7 @@ prop_blocks_amountOfCells (Sudoku rows) = length (blocks (Sudoku rows)) == 27
 
 -- Checks through all rows and verifies that they are okay blocks, thus the whole sudoku is okay.
 isOkay :: Sudoku -> Bool
-isOkay s = and (map isOkayBlock (rows s))
+isOkay s = and (map isOkayBlock (blocks s))
 
 
 --E, tuple of ints, represents a position.
@@ -138,7 +138,7 @@ type Pos = (Int,Int)
 blanks :: Sudoku -> [Pos]
 blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 
--- For a provided position, finds all nothing positions and verifies for each of those that they are indeed, nothing.
+-- For a provided sudoku, finds all nothing positions and verifies for each of those that they are indeed, nothing.
 prop_blanks_allBlank :: Sudoku -> Bool
 prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blanks (Sudoku rows)) 
 
@@ -220,6 +220,11 @@ candidates sud (x,y) | isSudoku sud = intersect
                              row   = block!!x
                              col   = block!!(9 + y)
                              square= block!!(18 + sqPos) 
+
+{-prop_candidates_allowed :: Sudoku -> Pos -> Bool
+prop_candidates_allowed sud (x,y) | length cs == 0 = not (isSudoku sud) || isSolved sud
+                                  | otherwise = isSudoku $ update sud (x,y) Just i | i <- cs
+                                  where cs = candidates sud (x,y)-}
 
 
 --Finds which of the 9x9 block the x,y position belongs to. 
