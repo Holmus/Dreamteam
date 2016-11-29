@@ -75,10 +75,11 @@ createSudoku s | isSudoku sudoku = sudoku
                | otherwise = error "The provided file is not a sudoku"
                where sudoku =  Sudoku ([[charToMaybe i | i <- x]| x <- words s])
 
---C
+-- Generates a cell, with 10% prob, of a Just int and 90% prob of Nothing. Utilizes randomJust
 cell :: Gen (Maybe Int)
 cell =  frequency [(1,randomJust),(9,elements [Nothing])]
 
+-- Generates a just int between just 1-9
 randomJust :: Gen (Maybe Int)
 randomJust = elements [Just i | i <- [1..9]]
 
@@ -87,30 +88,38 @@ instance Arbitrary Sudoku where
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
 
+-- Utilizes isSudoku to check whether the sudoku solely consists of allowed values
 prop_Sudoku :: Sudoku -> Bool
 prop_Sudoku s = isSudoku s
 
---D
+-- Datatype consisting of an array of maybe ints, which we intend to use to represent one square, col or row of length 9
 type Block = [Maybe Int]  
 
+-- Verifies that the block provided is of length 9, consists of no Nothings and is solely unique values. If so returns true
 isOkayBlock :: Block -> Bool
 isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
                     where numBlock = filter (\a -> if a == Nothing then False else True) block
 
+-- Creates blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
+-- Utilizes getRows, getColumns and getSquare
 blocks :: Sudoku -> [Block]
 blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
          | otherwise  = [] 
           where squares = [getSquare (rows s) x y | y <- [0,3,6], x <- [0,3,6]]
 
+-- Given a sudoku, returns all the rows as an array of blocks.
 getRows :: Sudoku -> [Block]
 getRows s = rows s
 
+-- Given a sudoku, returns all the columns as an array of blocks.
 getColums :: Sudoku -> [Block]
 getColums s = transpose (rows s)
 
+-- Given a sudoku and two indexes, returns a 3x3 square at the provided position
 getSquare :: [Block] -> Int -> Int -> Block
 getSquare rows x y  = concat [ take 3 (drop x row) | row <- take 3 (drop y rows)]
 
+-- 
 prop_blocks_amountOfCells :: Sudoku -> Bool
 prop_blocks_amountOfCells (Sudoku rows) = length (blocks (Sudoku rows)) == 27
                                         && all (\a -> if length a == 9 then True else False) rows
