@@ -161,18 +161,14 @@ prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blan
 validTestInput :: [a] -> (Int,a) -> Bool 
 validTestInput arr (i,el) = i >= 0 && i < length arr
 
-prop_replace_length :: [a] -> (Int,a) -> Bool
-prop_replace_length arr (i,el) = i >= 0 && i < length arr ==>
+prop_replace_length :: [a] -> (Int,a) -> Property
+prop_replace_length arr (i,el) = validTestInput arr (i,el) ==>
                                  length arr == length (arr !!= (i,el))
 
 
-prop_replace_correct :: [a] -> (Int,a) -> Bool
-prop_replace_correct arr (i,el) = validTestInput arr (i,el) ==> 
-                                  (replaced)!!i == el &&
-                                  length arr == length ([j | j <- [0..((length arr) -1)],replaced!!j == arr!!j]) -1
-                                  where replaced = arr !!= (i,el)
-
-
+prop_replace_correct :: Eq a => [a] -> (Int,a) -> Property
+prop_replace_correct arr (i,el) = validTestInput arr (i,el)  ==> (!!=) arr (i,el)!!i == el && 
+                                  and [True | j <- [0..((length arr)-1)],not (j == i)]
 
 
 
