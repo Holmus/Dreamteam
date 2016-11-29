@@ -17,7 +17,7 @@ ex2 = Sudoku [
 
 example =
   Sudoku
-    [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing]
+    [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 2, Nothing,Nothing,Nothing]
     , [Nothing,Just 5, Nothing,Nothing,Nothing,Nothing,Just 1, Just 8, Nothing]
     , [Nothing,Nothing,Just 9, Just 2, Nothing,Just 4, Just 7, Nothing,Nothing]
     , [Nothing,Nothing,Nothing,Nothing,Just 1, Just 3, Nothing,Just 2, Just 8]
@@ -28,46 +28,48 @@ example =
     , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 3]
     ]
 
---A
+-- Creates an empty sudoku board consisting of a 9x9 table "filled" with Nothing
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 
-
+-- Given a sudoku, verifies that it's a 9 by 9 sudoku. With only allowed values (Nothing or Just 1-9)
 isSudoku :: Sudoku -> Bool
 isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
                     ++ [y | y <- oneArray, y == Nothing])
-                    == 81 
+                    == 81
              where oneArray = concat (rows s)
 
--- For the sudoku to be solved it needs to be a legit sudoku, 
--- then it can not contain any element of nothing. 
+-- For the sudoku to be solved it needs to be a legit sudoku, that is, it can contain no "Nothing"-elements and has to consist of 1-9's solely.
 isSolved :: Sudoku -> Bool
 isSolved s = isSudoku s && notElem Nothing (concat (rows s))
 
 
---B
+-- Given a maybe int, it returns it as a char. That is a Just 1-9, returns 1-9 and Nothing returns '.'
 printFormat :: Maybe Int -> Char
 printFormat (Just x) = intToDigit x
 printFormat Nothing = '.'
 
+-- Given an array of chars it combines them together as a string, separating each character with the new line
 convertToString :: [[Char]] -> String
 convertToString (x:[]) = x ++ "\n"
 convertToString (x:xs) = x ++ "\n" ++ convertToString xs
 
-
+-- ?
 printSudoku :: Sudoku -> IO ()
 printSudoku s | (rows s) == [] = return ()
               | otherwise = putStr (convertToString (map (map printFormat) (rows s)))
 
+-- Given a filepath creates a sudoku from the string found in the file
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do string <- readFile path
                      return (createSudoku string)
 
+-- Given a char . or 1-9 returns it as a Maybe Int, i.e Just 1-9 or Nothing
 charToMaybe :: Char -> Maybe Int
 charToMaybe c | c == '.' = Nothing
               | isDigit c = (Just (digitToInt c)) 
 
-
+-- Given a string creates the corresponding sudoku if the string is using the desired notation (1-9, .)
 createSudoku :: String -> Sudoku
 createSudoku s | isSudoku sudoku = sudoku
                | otherwise = error "The provided file is not a sudoku"
