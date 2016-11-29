@@ -171,14 +171,20 @@ prop_replace_correct arr (i,el) = validTestInput arr (i,el)  ==> (!!=) arr (i,el
  
 --E3
 
+rPos :: Gen Pos
+rPos = (fromIntegral (elements [0..8]),fromIntegral (elements [0..8]))
+
+
+
 -- 
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update (Sudoku rows) (row,col) el = Sudoku ((!!=) rows (row, ((!!=) (rows!!row) (col,el))))
 
-{-
-prop_update_correctVal :: Sudoku -> (Positive Int, Positive Int) -> Maybe Int -> Bool
-prop_update_correctVal s (row,col) el = (rows (update s (row,col) el))!!row!!col == el
--}
+prop_update_correctVal :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_update_correctVal s (row,col) el = rows (update s (mRow,mCol) el)!!mRow!!mCol == el
+                                        where mRow = (abs row) `mod` 9
+                                              mCol = (abs col) `mod` 9
+
 --E4
   
 candidates :: Sudoku -> Pos -> [Int]
