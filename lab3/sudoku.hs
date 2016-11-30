@@ -7,14 +7,6 @@ import Data.List
 data Sudoku = Sudoku { rows :: [[Maybe Int]] }
                 deriving Show
 
-ex1 = [Just 3, Just 9, Just 10, Nothing, Just 0]
-ex2 = Sudoku [
-              [Just 3, Just 4, Just 5],
-              [Just 3, Just 4, Just 5],
-              [Just 3, Just 4, Just 5]  
-             ]
-
-
 example =
   Sudoku
     [ [Just 3, Just 6, Nothing,Nothing,Just 7, Just 1, Just 2, Nothing,Nothing]
@@ -28,18 +20,18 @@ example =
     , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 3]
     ]
 
--- Creates an empty sudoku consisting of a 9x9 table "filled" with Nothing
+--A1  Creates an empty sudoku consisting of a 9x9 table "filled" with Nothing
 allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 
--- Given a sudoku, verifies that it's a 9 by 9 sudoku. With only allowed values (Nothing or Just 1-9)
+--A2 Given a sudoku, verifies that it's a 9 by 9 sudoku. With only allowed values (Nothing or Just 1-9)
 isSudoku :: Sudoku -> Bool
 isSudoku s = length ([(Just x) | (Just x) <- oneArray, x < 10 && x > 0]
                     ++ [y | y <- oneArray, y == Nothing])
                     == 81 && length (getRows s) == 9
              where oneArray = concat (rows s)
 
--- For the sudoku to be solved it needs to be a legit sudoku, that is, it can contain no "Nothing"-elements and has to consist of 1-9's solely.
+--A3 For the sudoku to be solved it needs to be a legit sudoku, that is, it can contain no "Nothing"-elements and has to consist of 1-9's solely.
 isSolved :: Sudoku -> Bool
 isSolved s = isSudoku s && notElem Nothing (concat (rows s))
 
@@ -53,12 +45,12 @@ convertToString :: [[Char]] -> String
 convertToString (x:[]) = x ++ "\n"
 convertToString (x:xs) = x ++ "\n" ++ convertToString xs
 
--- Given a sudoku, creates instructions to print the sudoku on the screen, Nothing is represented by '.'
+--B1 Given a sudoku, creates instructions to print the sudoku on the screen, Nothing is represented by '.'
 printSudoku :: Sudoku -> IO ()
 printSudoku s | (rows s) == [] = return ()
               | otherwise = putStr (convertToString (map (map printFormat) (rows s)))
 
--- Given a filepath creates instructions that reads a sudoku from the file
+--B2 Given a filepath creates instructions that reads a sudoku from the file
 readSudoku :: FilePath -> IO Sudoku
 readSudoku path = do string <- readFile path
                      return (createSudoku string)
@@ -75,7 +67,7 @@ createSudoku s | isSudoku sudoku = sudoku
                | otherwise = error "The provided file is not a sudoku"
                where sudoku =  Sudoku ([[charToMaybe i | i <- x]| x <- words s])
 
--- Generates a cell, with 10% prob of a Just int and 90% prob of Nothing. Utilizes randomJust
+--C1 Generates a cell, with 10% prob of a Just int and 90% prob of Nothing. Utilizes randomJust
 cell :: Gen (Maybe Int)
 cell =  frequency [(1,randomJust),(9,elements [Nothing])]
 
@@ -83,25 +75,26 @@ cell =  frequency [(1,randomJust),(9,elements [Nothing])]
 randomJust :: Gen (Maybe Int)
 randomJust = elements [Just i | i <- [1..9]]
 
+
+--C2
 instance Arbitrary Sudoku where
   arbitrary =
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
 
--- Property for the isSudoku-function to check whether the sudoku solely consists of allowed values
+--C3 Property for the isSudoku-function to check whether the sudoku solely consists of allowed values
 prop_Sudoku :: Sudoku -> Bool
 prop_Sudoku s = isSudoku s
 
--- Datatype consisting of an array of maybe ints, which is intended to be used to represent one square, col or row of length 9
 type Block = [Maybe Int]  
 
--- Verifies that the block provided is of length 9, consists of unique values with disregard to nothing.
+--D1 Verifies that the block provided is of length 9, consists of unique values with disregard to nothing.
 -- Returns true if those conditions are met
 isOkayBlock :: Block -> Bool
 isOkayBlock block | length block == 9 = length (nub numBlock) == length numBlock
-                    where numBlock = filter (\a -> if a == Nothing then False else True) block
+  where numBlock = filter (\a -> if a == Nothing then False else True) block
 
--- Creates an array of blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
+--D2 Creates an array of blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
 -- Utilizes getRows, getColumns and getSquare
 blocks :: Sudoku -> [Block]
 blocks s | isSudoku s = (getRows s) ++ (getColums s) ++ squares
@@ -125,7 +118,7 @@ prop_blocks_amountOfCells :: Sudoku -> Bool
 prop_blocks_amountOfCells (Sudoku rows) = length (blocks (Sudoku rows)) == 27
                                         && all (\a -> if length a == 9 then True else False) rows
 
--- Checks through all rows and verifies that they are okay blocks, thus the whole sudoku is okay.
+--D3 Checks through all rows and verifies that they are okay blocks, thus the whole sudoku is okay.
 isOkay :: Sudoku -> Bool
 isOkay s = and (map isOkayBlock (blocks s))
 
@@ -143,15 +136,9 @@ blanks s = [ (x,y)| x <- [0..8], y <- [0..8], isNothing ( ((rows s)!!x) !!y )]
 prop_blanks_allBlank :: Sudoku -> Bool
 prop_blanks_allBlank (Sudoku rows) = all (\(x,y) -> rows!!x!!y == Nothing) (blanks (Sudoku rows)) 
 
-
---E2
--- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
--- Replaces an element in the provided array at the provided position with the provided element, then returns the updated array.
-
 -- E2
--- Also write (a) propert(y/ies) that state(s) the expected properties of this function. Think about what can go wrong! ????
-
--- Given a list and a tuple containing an index and a element, replace the element at the index with the elemeent provided.
+-- Given a list and a tuple containing an index and a element,
+-- replace the element at the index with the elemeent provided.
 (!!=) :: [a] -> (Int,a) -> [a]
 (!!=) [] _          = [] 
 (!!=) (x:xs) (i,el) | i < 0 || (length (x:xs) - 1) < i =
