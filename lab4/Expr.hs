@@ -19,8 +19,11 @@ data Un = Un {fun :: (Double->Double), unText :: String, unPrec :: Int}
 
 add = Bin (+) " + " 2
 mul = Bin (*) " * " 3
+min' = Bin (-) " -" 2
+div' = Bin (/) " / " 3
 sin' = Un sin "sin" 4
 cos' = Un cos "cos" 4
+
 
 --B
 showExpr :: Expr -> String
@@ -35,12 +38,8 @@ showExpr' op@(Oper b _ _) precAbove | binPrec b < precAbove = "(" ++ showExpr op
                                     | otherwise = showExpr op
 showExpr' x _ = show x
 
-eval :: Expr -> Double -> String
-eval e x = string
-            where string = replace (showExpr e) (show x)
-          
-replace :: String -> String -> String
-replace [] c = ""
-replace (x:xs) c | x == 'x' = c ++ replace xs c
-                 | otherwise = [x] ++ replace xs c
-
+eval :: Expr -> Double -> Double 
+eval (Num n) x = n
+eval (Var v) x = x
+eval (Fun f e1) x = (fun f (eval e1 x))
+eval (Oper o e1 e2) x = (binFun o) (eval e1 x) (eval e2 x)
