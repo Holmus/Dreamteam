@@ -1,10 +1,4 @@
-
-{-
-A. Design a (recursive) datatype Expr that represents expressions of the above kind.
-You may represent integer numbers by floating point numbers; it is not necessary to have 
-two different constructor functions for this. Your data type should be designed to make
- it easy to add more functions and more binary operators to the language.
--}
+--A
 data Expr = Num Double
             | Var Char
             | Oper Bin Expr Expr
@@ -12,40 +6,33 @@ data Expr = Num Double
 
 data Bin = Bin {binFun :: (Double->Double->Double), binText :: String, binPrec :: Int}
 
+instance Show Bin where
+    show = binText
 
-data Un = Un {fun :: (Double->Double), text :: String, prec :: Int}
+instance Show Un where
+    show = unText
+
+instance Show Expr where
+        show = showExpr
+
+data Un = Un {fun :: (Double->Double), unText :: String, unPrec :: Int}
 
 add = Bin (+) " + " 2
 mul = Bin (*) " * " 3
-sin' = Un sin "Sin" 4
-cos' = Un cos "Cos" 4
+sin' = Un sin "sin" 4
+cos' = Un cos "cos" 4
 
 --B
-{-
-
 showExpr :: Expr -> String
-showExpr (Num f)       = show f
-showExpr (Var x)       = "x" 
-showExpr (Add e1 e2)   = showExpr e1 ++ "+" ++ showExpr e2 
-showExpr (Mul e1 e2)   = showMul (Mul e1 e2)
-showExpr (Cos e)       = showCos (Cos e)
-showExpr (Sin e)       = showSin (Sin e)
+showExpr (Num f)                = show f
+showExpr (Var x)                = "x" 
+showExpr (Oper x y z)           = let p = binPrec x in showExpr' y p ++ show x ++ showExpr' z p
+showExpr (Fun x o@(Oper _ _ _)) = show x ++ "(" ++ showExpr o ++ ")"
+showExpr (Fun x e)              = show x ++ showExpr e
 
 
-showMul :: Expr -> String
-showMul (Mul (Add e1 e2) (Add e3 e4)) = "(" ++ showExpr (Add e1 e2) ++ ")*(" ++ showExpr (Add e3 e4) ++ ")"
-showMul (Mul e1 (Add e2 e3)) = showExpr (Add e1 e2) ++ "*(" ++ showExpr e3 ++ ")"
-showMul (Mul (Add e1 e2) e3) = "(" ++ showExpr (Add e1 e2) ++ ")*"  ++ showExpr e3
-showMul (Mul e1 e2) = showExpr e1 ++ "*" ++ showExpr e2
+showExpr' op@(Oper b _ _) precAbove | binPrec b < precAbove = "(" ++ showExpr op ++ ")" 
+                                    | otherwise = showExpr op
+showExpr' x _ = show x
 
-showCos :: Expr -> String 
-showCos (Cos (Num x)) = "Cos" ++ show x
-showCos (Cos (Var x)) = "Cos x"
-showCos (Cos e) = "Cos (" ++ showExpr e ++ ")"
-
-showSin :: Expr -> String
-showSin (Sin (Num x)) = "Sin" ++ show x
-showSin (Sin (Var x)) = "Sin x"
-showSin (Sin e)       = "Sin (" ++ showExpr e ++ ")"
-
--}
+ 
