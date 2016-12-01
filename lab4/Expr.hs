@@ -6,6 +6,7 @@ two different constructor functions for this. Your data type should be designed 
  it easy to add more functions and more binary operators to the language.
 -}
 data Expr = Num Float
+            | Var x
             | Add Expr Expr
             | Mul Expr Expr
             | Cos Expr
@@ -13,10 +14,5 @@ data Expr = Num Float
 
 --B
 showExpr :: Expr -> String
-showExpr (Num f) = show f
-showExpr (Add e1 e2) =  showExpr e1 ++ "+" ++ showExpr e2 
-showExpr (Mul (Num f1) (Num f2)) = showExpr (Num f1) ++ "*" ++ showExpr (Num f2)
-showExpr (Mul e1 (Num f)) = "(" ++ showExpr e1 ++ ")*" ++ showExpr (Num f)
-showExpr (Mul (Num f) e2 ) =  showExpr (Num f) ++ "*(" ++ showExpr e2 ++ ")"
-showExpr (Mul e1 e2) = "(" ++ showExpr e1 ++ ")*(" ++  showExpr e2 ++ ")"
+showExpr = undefined
 
