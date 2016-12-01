@@ -73,32 +73,7 @@ prop_ShowReadExpr = undefined
 --F
 
 simplify :: Expr -> Expr
-simplify x@(Num double)   = x
-simplify x@(Var char)     = x
-simplify o@(Oper mul _ _) = simplifyMul o
-simplify o@(Oper add _ _) = simplifyAdd o
-simplify f@(Fun cos' _)   = simplyfyCos f
-simplify f@(Fun sin' _)   = simplyfySin f
-
-simplifyMul :: Expr -> Expr
-simplifyMul (Oper mul (Num 0) _) = Num 0
-simplifyMul (Oper mul _ (Num 0)) = Num 0
-simplifyMul (Oper mul e (Num 1)) = e
-simplifyMul (Oper mul (Num 1) e) = e
-simplifyMul (Oper mul e1 e2)     = (Oper mul (simplify e1) (simplify e1))
-
-simplifyAdd :: Expr -> Expr
-simplifyAdd (Oper add (Num 0) e) = e 
-simplifyAdd (Oper add e (Num 0)) = e
-simplifyAdd (Oper add e1 e2)     = (Oper add (simplify e1) (simplify e2))
-
-simplyfyCos :: Expr -> Expr
-simplyfyCos (Fun cos' (Num 0)) = (Num 1)
-simplyfyCos (Fun cos' e) = (Fun cos' (simplify e))
-
-simplyfySin :: Expr -> Expr
-simplyfySin (Fun sin' (Num 1)) = (Num 1)
-simplyfySin (Fun sin' e) = (Fun sin' (simplify e))
+simplify = undefined
 
 prop_simplify :: Expr -> Bool
 prop_simplify e = (eval e 0) == (eval (simplify e) 0)
