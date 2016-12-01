@@ -20,8 +20,11 @@ data Un = Un {fun :: (Double->Double), unText :: String, unPrec :: Int}
 
 add = Bin (+) " + " 2
 mul = Bin (*) " * " 3
+min' = Bin (-) " -" 2
+div' = Bin (/) " / " 3
 sin' = Un sin "sin" 4
 cos' = Un cos "cos" 4
+
 
 --B
 showExpr :: Expr -> String
@@ -103,4 +106,3 @@ prop_simplify e = (eval e 0) == (eval (simplify e) 0)
 --G
 differentiate :: Expr -> Expr
 differentiate = undefined
-
