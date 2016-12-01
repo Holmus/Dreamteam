@@ -35,4 +35,12 @@ showExpr' op@(Oper b _ _) precAbove | binPrec b < precAbove = "(" ++ showExpr op
                                     | otherwise = showExpr op
 showExpr' x _ = show x
 
- 
+eval :: Expr -> Double -> String
+eval e x = string
+            where string = replace (showExpr e) (show x)
+          
+replace :: String -> String -> String
+replace [] c = ""
+replace (x:xs) c | x == 'x' = c ++ replace xs c
+                 | otherwise = [x] ++ replace xs c
+
