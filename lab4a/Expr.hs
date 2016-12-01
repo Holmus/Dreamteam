@@ -26,7 +26,7 @@ showAdd = undefined
 
 showMul :: Expr -> String
 showMul (Mul (Num e1) (Num e2)) = show e1 ++ "*" ++ show e2
-showMul (Mul e1 e2)            = "(" ++ showExpr e1 ++ "*" ++ showExpr e2 ++ ")"
+showMul (Mul e1 e2)            = "(" ++ showExpr e1 ++ ")*(" ++ showExpr e2 ++ ")"
 
 showCos :: Expr -> String
 showCos (Cos (Num x)) = "Cos" ++ show x
