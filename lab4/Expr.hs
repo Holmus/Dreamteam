@@ -126,6 +126,7 @@ fCos = do char 'c'
 
 --E
 
+--Skriv om denna så att den följer rekommendationer.
 prop_ShowReadExpr :: Expr -> Bool
 prop_ShowReadExpr e = showExpr e == (showExpr (fromJust (readExpr (showExpr e))))
 
