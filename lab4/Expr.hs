@@ -21,10 +21,10 @@ instance Show Expr where
 
 data Un = Un {fun :: (Double->Double), unText :: String, unPrec :: Int}
 
-add = Bin (+) " + " 2
-mul = Bin (*) " * " 3
-min' = Bin (-) " -" 2
-div' = Bin (/) " / " 3
+add = Bin (+) "+" 2
+mul = Bin (*) "*" 3
+min' = Bin (-) "-" 2
+div' = Bin (/) "/" 3
 sin' = Un sin "sin" 4
 cos' = Un cos "cos" 4
 
@@ -61,35 +61,28 @@ readExpr st | rem == "" = Just e
             | otherwise = Nothing
     where (e,rem) = fromJust (parse expression (rmWSpace st))
 
-expression,add',function,var,integer',term,term',factor,double' :: Parser Expr
+expression,add',function,var,integer',term,factor,double' :: Parser Expr
 
-expression = add' <|> term <|> integer' <|> var <|> function
+expression = oper' <|> function <|> factor 
 
-add' = do t <- term
+oper' = add' <|> term
+
+add' = do t <- factor
           char '+'
           exp <- expression
           return (Oper add t exp)
 
-term  = term' <|> factor <|> var
+term = do f <- factor
+          char '*'
+          t <- expression
+          return (Oper mul f t)
 
-term' = do f <- factor
-           char '*'
-           t <- term
-           return (Oper mul f t)
-
-factor = integer'
-         <|>
-         do char '('
-            e <- expression
-            char ')'
-            return e
+factor = function <|> integer' <|> double' <|> var
 
 var = do char 'x' 
          return (Var 'x')
 
-integer' = double'
-           <|> 
-           do i <- integer
+integer' = do i <- integer
               return (Num (fromIntegral i))
 
 double' = do i <- integer
@@ -102,15 +95,17 @@ integer :: Parser Integer
 integer = do i <- oneOrMore digit
              return (read i)
 
-function = do f <- fFun
-              e <- expression
-              return (Fun f  e) 
-            <|>
-            do f1 <- fFun
-               char '('
-               e1 <- expression
-               char ')'
-               return (Fun f1 e1)
+function = function' <|> function''
+            
+function' = do f <- fFun
+               e <- factor
+               return (Fun f e) 
+
+function'' = do f1 <- fFun
+                char '('
+                e1 <- expression
+                char ')'
+                return (Fun f1 e1)
 
 fFun :: Parser Un
 fFun = fSin <|> fCos
@@ -127,33 +122,26 @@ fCos = do char 'c'
           char 's'
           return (cos')         
 
-
-{-
-data Expr = Num Double
-            | Var Char
-            | Oper Bin Expr Expr
-            | Fun Un Expr
--}
-
 --E
--- NOT FINISHED DOESNT GENERATE CORRECT LENGTH!
+
+prop_ShowReadExpr :: Expr -> Bool
+prop_ShowReadExpr e = showExpr e == (showExpr (fromJust (readExpr (showExpr e))))
+
 arbExpr :: Int -> Gen Expr
-arbExpr i | i > 1       = rbin
-          | otherwise   = rNumVar
-          where rNumVar = elements ([Num j | j <- [0..10]] ++ [Var 'x']) 
-                rbin    = do op1 <- elements [Oper mul,Oper add]
-                             op2 <- elements [Fun sin', Fun cos']
-                             e1 <- arbExpr (i-1)
-                             e2 <- arbExpr (i-1)
-                             elements [(op1 e1 e2),(op2 e1)]
+arbExpr size = frequency [(4,rNumVar), (2,return (Var 'x')),(2*size,rOper),(size,rFun)]
+    where rNumVar = elements ([Num j | j <- [0..10]] ++ [Var 'x']) 
+          rOper = do op  <- elements [add,mul]
+                     op1 <- arbExpr (size `div` 2)
+                     op2 <- arbExpr (size `div` 2)
+                     return (Oper op op1 op2)
+          rFun  = do fun <- elements [sin',cos']
+                     exp <- arbExpr size
+                     return (Fun fun exp)
 
                 
                 
 instance Arbitrary Expr where
   arbitrary = sized arbExpr
-
-prop_ShowReadExpr :: Expr -> Bool
-prop_ShowReadExpr = undefined
 
 --F
 
