@@ -61,23 +61,26 @@ readExpr st | rem == "" = Just e
             | otherwise = Nothing
     where (e,rem) = fromJust (parse expression (rmWSpace st))
 
-expression,add',function,var,integer',term,factor,double' :: Parser Expr
+expression,function,var,integer',factor,double',term,expr',function',function'' :: Parser Expr
 
-expression = oper' <|> function <|> factor 
+expression = expr' <|> term
 
-oper' = add' <|> term
+expr' = do t <- term
+           char '+'
+           e <- expression
+           return (Oper add t e)
 
-add' = do t <- factor
-          char '+'
-          exp <- expression
-          return (Oper add t exp)
+term  = term' <|> factor
+term' = do f <- factor
+           char '*'
+           t <- term
+           return (Oper mul f t)
 
-term = do f <- factor
-          char '*'
-          t <- expression
-          return (Oper mul f t)
-
-factor = function <|> integer' <|> double' <|> var
+factor = function <|> double' <|> integer' <|> var <|>
+        do char '('
+           e <- expression
+           char ')'
+           return e
 
 var = do char 'x' 
          return (Var 'x')
@@ -90,13 +93,12 @@ double' = do i <- integer
              j <- integer
              return (Num (read ((show i) ++ "." ++ (show j))))
 
-
 integer :: Parser Integer
 integer = do i <- oneOrMore digit
              return (read i)
 
 function = function' <|> function''
-            
+                    
 function' = do f <- fFun
                e <- factor
                return (Fun f e) 
