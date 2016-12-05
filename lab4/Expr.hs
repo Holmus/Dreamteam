@@ -159,17 +159,17 @@ simCos e       = (Fun cos' e)
 simSin (Num 0) = (Num 0)
 simSin e       = (Fun sin' e)
 
-simMul (Num 0) _ = Num 0
-simMul _ (Num 0) = Num 0
-simMul (Num 1) e = e
-simMul e (Num 1) = e
+simMul (Num 0) _       = Num 0
+simMul _ (Num 0)       = Num 0
+simMul (Num 1) e       = e
+simMul e (Num 1)       = e
 simMul (Num x) (Num y) = (Num (x*y))
-simMul e e1       = (Oper mul e e1)
+simMul e e1            = (Oper mul e e1)
 
-simAdd (Num 0) e = e
-simAdd e (Num 0) = e 
+simAdd (Num 0) e       = e
+simAdd e (Num 0)       = e 
 simAdd (Num x) (Num y) = (Num (x+y))
-simAdd e e1      = simplify (Oper add e e1) 
+simAdd e e1            = (Oper add e e1) 
 
 prop_simplify :: Expr -> Bool
 prop_simplify e = (eval e 0) == (eval (simplify e) 0)
