@@ -63,14 +63,14 @@ readExpr st | rem == "" = Just e
 
 expression,function,var,integer',factor,double',term,expr',function',function'' :: Parser Expr
 
-expression = expr' <|> term
+expression = term
 
 expr' = do t <- term
            char '+'
            e <- expression
            return (Oper add t e)
 
-term  = term' <|> factor
+term  = expr' <|> term' <|> factor
 term' = do f <- factor
            char '*'
            t <- term

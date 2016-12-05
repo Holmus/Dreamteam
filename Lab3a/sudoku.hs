@@ -26,11 +26,12 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 
 --A2 Given a sudoku, verifies that it's a 9 by 9 sudoku. With only allowed values (Nothing or Just 1-9)
 isSudoku :: Sudoku -> Bool
-isSudoku s = length' (rows s) && length' (transpose (rows s))
+isSudoku s = all (==9) (map length (rows s)) 
+             && all (==9) (map length (transpose (rows s)))
              && all legitVal (concat (rows s))
-             where legitVal (Just x) = if x > 0 && x < 10 then True else False
+             where legitVal (Just x) = x > 0 && x < 10 
                    legitVal Nothing  = True 
-                   length' arr       = all (\a -> length a == 9) arr
+                  
 
 
 
@@ -86,7 +87,7 @@ type Block = [Maybe Int]
 --D1 Verifies that the block provided is of length 9, consists of unique values with disregard to nothing.
 -- Returns true if those conditions are met
 isOkayBlock :: Block -> Bool
-isOkayBlock block = length (nub numBlock) == length numBlock
+isOkayBlock block = (nub numBlock) == numBlock
    where numBlock = filter isJust block
 
 --D2 Creates an array of blocks from a provided sudoku, if the sudoku consists of disallowed characters: returns [].
