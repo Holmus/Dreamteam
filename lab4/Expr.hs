@@ -148,34 +148,34 @@ instance Arbitrary Expr where
 simMul,simAdd :: Expr -> Expr -> Expr
 simplify, simFun :: Expr -> Expr
 
-simplify o@(Oper a b c) = simOper o
-simplify f@(Fun _ _)    = simFun f
+simplify o@(Oper a b c) = (simOper o)
+simplify f@(Fun _ _)    = (simFun f)
 simplify (Num f)        = (Num f)
 simplify (Var x)        = (Var x)
 
-simOper (Oper (Bin _ t _) e e1) | t == "*" = (simMul e e1)
-                                | otherwise = (simAdd e e1)
+simOper (Oper (Bin _ t _) e e1) | t == "*" = (simMul (simplify e) (simplify e1))
+                                | otherwise = (simAdd (simplify e) (simplify e1))
 
-simFun (Fun (Un _ t _) e) | t == "sin" = (simSin e)
-                            | otherwise = (simCos e)
+simFun (Fun (Un _ t _) e) | t == "sin" = (simSin (simplify e))
+                          | otherwise = (simCos (simplify e))
 
-simCos (Num 1) = (Num 0)
-simCos e       = (Fun cos' (simplify e))
+simCos (Num 0) = (Num 1)
+simCos e       = (Fun cos' e)
 
 simSin (Num 0) = (Num 0)
-simSin e       = (Fun sin' (simplify e))
+simSin e       = (Fun sin' e)
 
 simMul (Num 0) _       = Num 0
 simMul _ (Num 0)       = Num 0
 simMul (Num 1) e       = e
 simMul e (Num 1)       = e
 simMul (Num x) (Num y) = (Num (x*y))
-simMul e e1            = (Oper mul (simplify e) (simplify e1))
+simMul e e1            = (Oper mul e e1)
 
 simAdd (Num 0) e       = e
 simAdd e (Num 0)       = e 
 simAdd (Num x) (Num y) = (Num (x+y))
-simAdd e e1            = (Oper add (simplify e) (simplify e1))
+simAdd e e1            = (Oper add e e1)
 
 prop_simplify :: Expr -> Bool
 prop_simplify e = (eval e 0) == (eval (simplify e) 0)
