@@ -63,14 +63,14 @@ readExpr st | rem == "" = Just e
 
 expression,function,var,integer',factor,double',term,expr',function',function'' :: Parser Expr
 
-expression = term
+expression = expr' <|> term
 
 expr' = do t <- term
            char '+'
            e <- expression
            return (Oper add t e)
 
-term  = expr' <|> term' <|> factor
+term  = term' <|> factor
 term' = do f <- factor
            char '*'
            t <- term
@@ -91,7 +91,7 @@ integer' = do i <- integer
 double' = do i <- integer
              char '.'
              j <- integer
-             return (Num (read ((show i) ++ "." ++ (show j))))
+             return $ Num $ read $ (show i) ++ "." ++ (show j)
 
 integer :: Parser Integer
 integer = do i <- oneOrMore digit
@@ -126,7 +126,7 @@ fCos = do char 'c'
 
 --E
 
---Skriv om denna så att den följer rekommendationer.
+--Skriv om denna så att den följer rekommendationer.    
 prop_ShowReadExpr :: Expr -> Bool
 prop_ShowReadExpr e = showExpr e == (showExpr (fromJust (readExpr (showExpr e))))
 
@@ -140,16 +140,36 @@ arbExpr size = frequency [(4,rNumVar), (2,return (Var 'x')),(2*size,rOper),(size
           rFun  = do fun <- elements [sin',cos']
                      exp <- arbExpr size
                      return (Fun fun exp)
-
-                
                 
 instance Arbitrary Expr where
   arbitrary = sized arbExpr
 
 --F
+simMul,simAdd :: Expr -> Expr -> Expr
+simplify, simFun :: Expr -> Expr
 
-simplify :: Expr -> Expr
-simplify = undefined
+simplify o@(Oper a b c) = simOper o
+simplify f@(Fun _ _)    = simFun f
+simplify e              = e
+
+
+simCos (Num 1) = (Num 0)
+simCos e       = (Fun cos' e)
+
+simSin (Num 0) = (Num 0)
+simSin e       = (Fun sin' e)
+
+simMul (Num 0) _ = Num 0
+simMul _ (Num 0) = Num 0
+simMul (Num 1) e = e
+simMul e (Num 1) = e
+simMul (Num x) (Num y) = (Num (x*y))
+simMul e e1       = (Oper mul e e1)
+
+simAdd (Num 0) e = e
+simAdd e (Num 0) = e 
+simAdd (Num x) (Num y) = (Num (x+y))
+simAdd e e1      = simplify (Oper add e e1) 
 
 prop_simplify :: Expr -> Bool
 prop_simplify e = (eval e 0) == (eval (simplify e) 0)
