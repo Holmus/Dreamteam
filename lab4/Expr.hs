@@ -188,13 +188,17 @@ differentiate (Var x)        = (Num 1)
 differentiate f@(Fun _ _)    = simplify (diffFun f)
 differentiate o@(Oper _ _ _) = simplify (diffOper o)
 
-diffOper (Oper (Bin _ t _) e e1) | t == "+"  = (Oper add (differentiate e) (differentiate e1))
-                                 | otherwise = (Oper add (Oper mul (differentiate e) e1 ) (Oper mul e (differentiate  e1))) --Kedjeregeln
+diffOper (Oper (Bin _ t _) e e1) 
+    | t == "+"  = (Oper add (differentiate e) (differentiate e1))
+    | otherwise = (Oper add 
+                    (Oper mul (differentiate e) e1 ) 
+                    (Oper mul e (differentiate  e1))
+                   ) --Kedjeregeln
 
-diffFun (Fun (Un _ t _) e) | t == "sin" = (Oper mul (Fun cos' e) (differentiate e))
-                           | otherwise = 
-                            (Oper mul 
-                                (Oper mul (Num (-1)) (Fun sin' e)) 
-                                (differentiate e)
-                            ) 
+diffFun (Fun (Un _ t _) e) 
+    | t == "sin" = (Oper mul (Fun cos' e) (differentiate e))
+    | otherwise = (Oper mul 
+                    (Oper mul (Num (-1)) (Fun sin' e)) 
+                    (differentiate e)
+                  ) 
 
