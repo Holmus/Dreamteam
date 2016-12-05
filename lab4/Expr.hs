@@ -146,7 +146,7 @@ instance Arbitrary Expr where
 
 --F
 simMul,simAdd :: Expr -> Expr -> Expr
-simplify, simFun :: Expr -> Expr
+simplify,simFun,simSin,simCos,simOper :: Expr -> Expr
 
 simplify o@(Oper a b c) = (simOper o)
 simplify f@(Fun _ _)    = (simFun f)
@@ -174,6 +174,7 @@ simMul e e1            = (Oper mul e e1)
 
 simAdd (Num 0) e       = e
 simAdd e (Num 0)       = e 
+simAdd (Var x) (Var y) = (Oper mul (Num 2) (Var x))
 simAdd (Num x) (Num y) = (Num (x+y))
 simAdd e e1            = (Oper add e e1)
 
@@ -182,4 +183,18 @@ prop_simplify e = (eval e 0) == (eval (simplify e) 0)
 
 --G
 differentiate :: Expr -> Expr
-differentiate = undefined
+differentiate (Num i)        = (Num 0)
+differentiate (Var x)        = (Num 1)
+differentiate f@(Fun _ _)    = simplify (diffFun f)
+differentiate o@(Oper _ _ _) = simplify (diffOper o)
+
+diffOper (Oper (Bin _ t _) e e1) | t == "+"  = (Oper add (differentiate e) (differentiate e1))
+                                 | otherwise = (Oper add (Oper mul (differentiate e) e1 ) (Oper mul e (differentiate  e1))) --Kedjeregeln
+
+diffFun (Fun (Un _ t _) e) | t == "sin" = (Oper mul (Fun cos' e) (differentiate e))
+                           | otherwise = 
+                            (Oper mul 
+                                (Oper mul (Num (-1)) (Fun sin' e)) 
+                                (differentiate e)
+                            ) 
+
