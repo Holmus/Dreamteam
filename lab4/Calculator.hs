@@ -17,6 +17,14 @@ canHeight = 300
 readAndDraw :: Elem -> Canvas -> IO ()
 readAndDraw = undefined
 
+points :: Expr -> Double -> (Int,Int) -> [Point]
+points e d (width,height) = undefined
+
+reformatXY :: Point -> Double -> (Int,Int) -> Point
+reformatXY (x,y) scale (width, height) = (xNew,yNew)
+    where xNew = ((realToFrac x)/(scale) + ((realToFrac width)/2))
+          yNew = ((realToFrac height)/2) - (realToFrac y)/(scale) 
+
 main = do
     -- Elements
     canvas  <- mkCanvas canWidth canHeight   -- The drawing area
@@ -43,4 +51,5 @@ main = do
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
       -- "Enter" key has code 13
+
 
