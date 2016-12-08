@@ -25,19 +25,16 @@ readAndDraw e c = do s <- getProp e "value"
 
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points e scale (w,h) = [(x,y) | (x,y) <- [formXY (i,eval e i) scale (w',h') | i <- [low,(low +0.1)..up]],isValPos (x,y) (w',h')]
+points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [0..w']]
     where w'  = realToFrac w
           h'  = realToFrac h
           up  = (w'*scale)/2
           low = -up
 
-isValPos :: (Double,Double) -> (Double,Double) -> Bool
-isValPos (x,y) (w,h) = x >= 0 && x <= w && y >= 0 && y <= h
-
 formXY :: (Double, Double) -> Double -> (Double,Double) -> Point
-formXY (x,y) scale (width, height) = (realToFrac (round xNew),realToFrac (round yNew))
+formXY (x,y) scale (width, height) = (xNew,yNew)
     where xNew = x/scale + width/2
-          yNew = height/2 - y/scale 
+          yNew = height/2 - y/scale
 
 main = do
     -- Elements
