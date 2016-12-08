@@ -18,7 +18,7 @@ readAndDraw :: Elem -> Canvas -> IO ()
 readAndDraw = undefined
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [low..up]]
+points e scale (w,h) = [(x,y) | (x,y) <- [formXY (i,eval e i) scale (w',h') | i <- [low..up]],isValPos (x,y) (w',h')]
     where w'  = realToFrac w
           h'  = realToFrac h
           up  = (w'*scale)/2
