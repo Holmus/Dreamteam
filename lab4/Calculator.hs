@@ -20,10 +20,10 @@ readAndDraw = undefined
 points :: Expr -> Double -> (Int,Int) -> [Point]
 points e d (width,height) = undefined
 
-reformatXY :: Point -> Double -> (Int,Int) -> Point
+reformatXY :: (Double, Double) -> Double -> (Double,Double) -> Point
 reformatXY (x,y) scale (width, height) = (xNew,yNew)
-    where xNew = ((realToFrac x)/(scale) + ((realToFrac width)/2))
-          yNew = ((realToFrac height)/2) - (realToFrac y)/(scale) 
+    where xNew = x/scale + width/2
+          yNew = height/2 - y/scale 
 
 main = do
     -- Elements
