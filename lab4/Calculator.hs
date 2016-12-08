@@ -4,7 +4,7 @@ import Haste hiding (eval)
 import Haste.DOM
 import Haste.Events
 import Haste.Graphics.Canvas
-
+import Data.Ix
 import Pages
 
 import Expr
@@ -18,10 +18,17 @@ readAndDraw :: Elem -> Canvas -> IO ()
 readAndDraw = undefined
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points e d (width,height) = undefined
+points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [low..up]]
+    where w'  = realToFrac w
+          h'  = realToFrac h
+          up  = (w'*scale)/2
+          low = -up
 
-reformatXY :: (Double, Double) -> Double -> (Double,Double) -> Point
-reformatXY (x,y) scale (width, height) = (xNew,yNew)
+isValPos :: (Double,Double) -> (Double,Double) -> Bool
+isValPos (x,y) (w,h) = x >= 0 && x <= w && y >= 0 && y <= h
+
+formXY :: (Double, Double) -> Double -> (Double,Double) -> Point
+formXY (x,y) scale (width, height) = (xNew,yNew)
     where xNew = x/scale + width/2
           yNew = height/2 - y/scale 
 
