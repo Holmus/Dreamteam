@@ -20,8 +20,8 @@ readAndDraw e c = do s <- getProp e "value"
                      height <- getProp c "height"
                      width <- getProp c "width"
                      let exp = fromJust (readExpr s)
-                     let ps = points exp ((read height)/canHeight) (width,height)
-                     render c (path ps)
+                     let ps = points exp ((read width)/canWidth) (read width, read height)
+                     render c (stroke $ path ps)
 
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
@@ -41,7 +41,7 @@ formXY (x,y) scale (width, height) = (realToFrac (round xNew),realToFrac (round 
 
 main = do
     -- Elements
-    canvas  <- mkCanvas canWidth canHeight   -- The drawing area
+    canvas  <- mkCanvas (round canWidth) canHeight   -- The drawing area
     fx      <- mkHTML "<i>f</i>(<i>x</i>)="  -- The text "f(x)="
     input   <- mkInput 20 "x"                -- The formula input
     draw    <- mkButton "Draw graph"         -- The draw button
