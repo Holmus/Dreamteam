@@ -71,6 +71,7 @@ readAndDrawDiff e c = do
                      height<- getProp c "height"
                      width <- getProp c "width"
                      let exp = differentiate $ fromJust (readExpr s)
+                     _     <- setProp e "value" (showExpr exp)
                      let ps = points exp ((read width)/canWidth) (read width, read height)
                      render c (stroke $ path ps)
 
