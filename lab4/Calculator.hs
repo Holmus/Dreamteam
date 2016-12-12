@@ -16,13 +16,22 @@ canWidth  = 300
 canHeight = 300
 
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw e c = do s <- getProp e "value"
+readAndDraw e c = do s      <- getProp e "value"
                      height <- getProp c "height"
-                     width <- getProp c "width"
+                     width  <- getProp c "width"
                      let exp = fromJust (readExpr s)
                      let ps = points exp ((read width)/canWidth) (read width, read height)
                      render c (stroke $ path ps)
 
+readZoomAndDraw  :: Elem -> Canvas -> IO ()
+readZoomAndDraw e c = do s      <- getProp e "value"
+                         height <- getProp c "height"
+                         width  <- getProp c "width"
+                         scale  <- getProp e "zoom"
+                         let sca = eval (fromJust (readExpr s)) 0
+                         let exp = fromJust (readExpr s)
+                         let ps = points exp (sca*(read width)/canWidth) (read width, read height)
+                         render c (stroke $ path ps)
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
 points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [0..w']]
@@ -43,13 +52,14 @@ main = do
     input   <- mkInput 20 "x"                -- The formula input
     draw    <- mkButton "Draw graph"         -- The draw button
     diff    <- mkButton "Draw differentiated graph"         -- The draw button
+    zoom    <- mkInput 20 "Zoom"
       -- The markup "<i>...</i>" means that the text inside should be rendered
       -- in italics.
 
     -- Layout
     formula <- mkDiv
     row formula [fx,input]
-    column documentBody [canvas,formula,draw]
+    column documentBody [canvas,formula,draw,zoom]
 
     -- Styling
     setStyle documentBody "backgroundColor" "lightblue"
@@ -63,6 +73,7 @@ main = do
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
     onEvent diff  Click $ \_    -> readAndDrawDiff input can
+    onEvent zoom  KeyUp $ \code -> when (code==13) $ readZoomAndDraw zoom can
       -- "Enter" key has code 13
 
 readAndDrawDiff :: Elem -> Canvas -> IO ()
