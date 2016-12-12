@@ -11,8 +11,6 @@ import Data.Maybe
 
 import Expr
 
-
-
 canWidth  = 300
 canHeight = 300
 
