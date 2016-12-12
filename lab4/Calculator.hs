@@ -27,14 +27,14 @@ readZoomAndDraw  :: Elem -> Canvas -> IO ()
 readZoomAndDraw e c = do s      <- getProp e "value"
                          height <- getProp c "height"
                          width  <- getProp c "width"
-                         scale  <- getProp e "zoom"
-                         let sca = eval (fromJust (readExpr s)) 0
+                         scal   <- getProp e "zoom"
+                         let sca = eval (fromJust (readExpr scal)) 0
                          let exp = fromJust (readExpr s)
-                         let ps = points exp (sca*(read width)/canWidth) (read width, read height)
-                         render c (stroke $ path ps)
+                         let ps = points exp ((read width)/canWidth) (read width, read height)
+                         render c (scale (sca,sca) (stroke $ path ps))
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [0..w']]
+points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [(-w')..w']]
     where w'  = realToFrac w
           h'  = realToFrac h
           up  = (w'*scale)/2
@@ -74,8 +74,8 @@ main = do
     onEvent draw  Click $ \_    -> readAndDraw input can
     onEvent input KeyUp $ \code -> when (code==13) $ readAndDraw input can
     onEvent diff  Click $ \_    -> readAndDrawDiff input can
-    onEvent scale Click $ \code -> when (code==13) $ readZoomAndDraw zoom can
-    onEvent zoom KeyUp $ \code -> when (code==13) $ readZoomAndDraw zoom can
+    onEvent scale Click $ \_    -> readZoomAndDraw zoom can
+    onEvent zoom KeyUp  $ \code -> when (code==13) $ readZoomAndDraw zoom can
       -- "Enter" key has code 13
 
 readAndDrawDiff :: Elem -> Canvas -> IO ()
