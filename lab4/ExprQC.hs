@@ -6,7 +6,6 @@ import Expr
 
 instance Arbitrary Expr where
   arbitrary = sized arbExpr
---Skriv om denna så att den följer rekommendationer.   
 
 
 arbExpr :: Int -> Gen Expr
