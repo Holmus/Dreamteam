@@ -10,6 +10,7 @@ data Expr = Num Double
 
 data Bin = Bin {binFun :: (Double->Double->Double), binText :: String, binPrec :: Int}
 
+
 instance Show Bin where
     show = binText
 
@@ -57,9 +58,9 @@ rmWSpace (x:xs)| isSpace x = rmWSpace xs
                | otherwise = [x] ++ rmWSpace xs
 
 readExpr :: String -> Maybe Expr
-readExpr st | rem == "" = Just e
-            | otherwise = Nothing
-    where (e,rem) = fromJust (parse expression (rmWSpace st))
+readExpr st | isNothing expr = Nothing
+            | otherwise = Just $ fst $ fromJust expr 
+  where expr = parse expression (rmWSpace st)
 
 expression,function,var,integer',factor,double',term,expr',function',function'' :: Parser Expr
 
@@ -162,6 +163,7 @@ simAdd (Var x) (Var y) = (Oper mul (Num 2) (Var x))
 simAdd (Num x) (Num y) = (Num (x+y))
 simAdd e e1            = (Oper add e e1)
 
+-- Take in double aswell.
 prop_simplify :: Expr -> Bool
 prop_simplify e = (eval e 0) == (eval (simplify e) 0)
 
