@@ -22,3 +22,7 @@ arbExpr size = frequency [(5,rNumVar), (1,return (Var 'x')),(size,rOper),(size,r
 
 prop_ShowReadExpr :: Expr -> Bool
 prop_ShowReadExpr e = showExpr e == (showExpr (fromJust (readExpr (showExpr e))))
+
+prop_simplify :: Expr -> Double -> Bool
+prop_simplify e i = (eval e i') == (eval (simplify e) i')
+  where i' = abs $ i

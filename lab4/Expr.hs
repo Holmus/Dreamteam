@@ -163,10 +163,6 @@ simAdd (Var x) (Var y) = (Oper mul (Num 2) (Var x))
 simAdd (Num x) (Num y) = (Num (x+y))
 simAdd e e1            = (Oper add e e1)
 
--- Take in double aswell.
-prop_simplify :: Expr -> Bool
-prop_simplify e = (eval e 0) == (eval (simplify e) 0)
-
 --G
 differentiate :: Expr -> Expr
 differentiate (Num i)        = (Num 0)
