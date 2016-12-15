@@ -25,7 +25,7 @@ readZoomAndDraw z v c = do s    <- getProp v "value"
                            render c (stroke $ path ps)
  
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [(-w')..w']]
+points e scale (w,h) = [formXY (i,eval e i) scale (w',h') | i <- [(-w'),(-w'+scale)..w']]
     where w'  = realToFrac w
           h'  = realToFrac h
           up  = (w'*scale)/2
