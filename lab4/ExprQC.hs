@@ -10,7 +10,7 @@ instance Arbitrary Expr where
 
 arbExpr :: Int -> Gen Expr
 arbExpr size = frequency [(5,rNumVar), (1,return (Var 'x')),(size,rOper),(size,rFun)]
-    where rNumVar = elements ([Num j | j <- [0..10]] ++ [Var 'x'] ) 
+    where rNumVar = elements ([Num j | j <- [-10..10]] ++ [Var 'x'] ) 
           rOper = do op  <- elements [add,mul]
                      op1 <- arbExpr (size `div` 2)
                      op2 <- arbExpr (size `div` 2)
@@ -25,4 +25,4 @@ prop_ShowReadExpr e = showExpr e == (showExpr (fromJust (readExpr (showExpr e)))
 
 prop_simplify :: Expr -> Double -> Bool
 prop_simplify e i = (eval e i') == (eval (simplify e) i')
-  where i' = abs $ i
+  where i' = i

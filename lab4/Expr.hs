@@ -62,7 +62,7 @@ readExpr st | isNothing expr = Nothing
             | otherwise = Just $ fst $ fromJust expr 
   where expr = parse expression (rmWSpace st)
 
-expression,function,var,integer',factor,double',term,expr',function',function'' :: Parser Expr
+expression,function,var,factor,term,expr',function',function'' :: Parser Expr
 
 expression = expr' <|> term
 
@@ -77,7 +77,7 @@ term' = do f <- factor
            t <- term
            return (Oper mul f t)
 
-factor = function <|> double' <|> integer' <|> var <|>
+factor = function <|> number <|> var <|>
         do char '('
            e <- expression
            char ')'
@@ -86,17 +86,8 @@ factor = function <|> double' <|> integer' <|> var <|>
 var = do char 'x' 
          return (Var 'x')
 
-integer' = do i <- integer
-              return (Num (fromIntegral i))
-
-double' = do i <- integer
-             char '.'
-             j <- integer
-             return $ Num $ read $ (show i) ++ "." ++ (show j)
-
-integer :: Parser Integer
-integer = do i <- oneOrMore digit
-             return (read i)
+number = do i <- readsP
+            return (Num i)
 
 function = function' <|> function''
                     
