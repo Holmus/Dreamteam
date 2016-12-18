@@ -58,9 +58,9 @@ rmWSpace (x:xs)| isSpace x = rmWSpace xs
                | otherwise = [x] ++ rmWSpace xs
 
 readExpr :: String -> Maybe Expr
-readExpr st | isNothing expr = Nothing
-            | otherwise = Just $ fst $ fromJust expr 
-  where expr = parse expression (rmWSpace st)
+readExpr st = readExpr' (parse expression (rmWSpace st)) 
+  where readExpr' (Just (s,"")) = Just s
+        readExpr' _             = Nothing
 
 expression,function,var,factor,term,expr',function',function'' :: Parser Expr
 
